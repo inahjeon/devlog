@@ -2,7 +2,7 @@
 layout: post
 title:  "Meet Michelangelo: Uber’s Machine Learning Platform (번역) (1)"
 date:   2019-03-25 00:46:00
-categories: [ml / data engineering]
+categories: [ml & data engineering]
 comments: true
 ---
 

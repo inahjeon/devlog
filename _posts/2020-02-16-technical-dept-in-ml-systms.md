@@ -2,7 +2,7 @@
 layout: post
 title:  "Hidden Technical Debt in Machine Learning Systems"
 date:   2020-02-16 18:47:00
-categories: [ml / data engineering]
+categories: [ml & data engineering]
 comments: true
 ---
 

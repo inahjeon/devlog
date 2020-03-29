@@ -2,7 +2,7 @@
 layout: post
 title:  "Selenium으로 Google Play Store 크롤링하기"
 date:   2019-02-11 01:35:00
-categories: [ml / data engineering]
+categories: [ml & data engineering]
 comments: true
 ---
 
