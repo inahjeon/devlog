@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Selenium으로 Google Play Store 크롤링하기 | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Selenium으로 Google Play Store 크롤링하기" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다." />
+<meta property="og:description" content="Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-02-10T19:35:00-06:00" />
+<script type="application/ld+json">
+{"description":"Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다.","headline":"Selenium으로 Google Play Store 크롤링하기","dateModified":"2019-02-10T19:35:00-06:00","datePublished":"2019-02-10T19:35:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html"},"url":"https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/devlog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/devlog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Selenium으로 Google Play Store 크롤링하기 | fastpages</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Selenium으로 Google Play Store 크롤링하기" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다." />
+<meta property="og:description" content="Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-02-10T19:35:00-06:00" />
+<script type="application/ld+json">
+{"description":"Selenium(https://www.seleniumhq.org) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다.","headline":"Selenium으로 Google Play Store 크롤링하기","dateModified":"2019-02-10T19:35:00-06:00","datePublished":"2019-02-10T19:35:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html"},"url":"https://inahjeon.github.io/devlog/2019/02/10/web-crawling.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="fastpages" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/devlog/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/devlog/about/">About Me</a><a class="page-link" href="/devlog/search/">Search</a><a class="page-link" href="/devlog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Selenium으로 Google Play Store 크롤링하기</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-02-10T19:35:00-06:00" itemprop="datePublished">
+        Feb 10, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><code class="highlighter-rouge">Selenium</code>(<a href="https://www.seleniumhq.org">https://www.seleniumhq.org</a>) 으로 Google Play Store를 크롤링하는 간단한 웹 크롤러를 만들어 보았다.</p>
+
+<h2 id="selenum-이란"><code class="highlighter-rouge">Selenum</code> 이란?</h2>
+<p>브라우저를 자동화하는 툴로, 주로 자동화된 웹 테스팅, 웹 자동화 작업에 사용되는 라이브러리다. 데이터 분석 분야에서는 데이터를 크롤링하기 위한 용도로 많이 활용되고 있다.</p>
+
+<p><strong>지원하는 웹 브라우저들</strong></p>
+<ul>
+  <li>Firefox</li>
+  <li>Internet Explorer</li>
+  <li>Safari</li>
+  <li>Opera</li>
+  <li>Chrome</li>
+</ul>
+
+<p>많이 사용되는 웬만한 브라우저는 다 지원하고 있고, 언어도 <code class="highlighter-rouge">Python</code>, <code class="highlighter-rouge">Java</code>, <code class="highlighter-rouge">R</code>, <code class="highlighter-rouge">Ruby</code> 등 널리 쓰이는 다양한 프로그래밍 언어를 지원하고 있다.</p>
+
+<h2 id="필요한-라이브러리-준비-실행">필요한 라이브러리 준비, 실행</h2>
+
+<p>크롤링을 위해 selenium 라이브러리를 설치하고, 사용할 웹 드라이버를 받아야한다.</p>
+
+<h3 id="selenium-python">Selenium (Python)</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install selenium
+</code></pre></div></div>
+
+<h3 id="web-driver">Web driver</h3>
+
+<p>웹 드라이버는 <a href="https://www.seleniumhq.org/about/platforms.jsp#browsers">https://www.seleniumhq.org/about/platforms.jsp#browsers</a> 에서 원하는 드라이버를 찾아서 다운받을 수 있는 링크로 이동할 수 있다. 여기선 익숙한 Chrome 드라이버를 설치해보았다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61559760-66a62100-aaa5-11e9-8780-fcdb0db3f3ca.png" alt="" /></p>
+
+<h2 id="웹-브라우저-실행하기">웹 브라우저 실행하기</h2>
+
+<p>일단 간단하게 웹 브라우저를 실행해보았다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s">'./chromedriver'</span><span class="p">)</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://www.google.com'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61559764-69a11180-aaa5-11e9-901a-83d9ff3b1538.png" alt="" /></p>
+
+<p>코드를 실행하면 웹 브라우저가 뜨고 입력한 url로 이동한다.</p>
+
+<h2 id="play-store-인기차트-크롤링">Play Store 인기차트 크롤링</h2>
+
+<p>Selenium으로 어떤 데이터를 크롤링 해볼까하다가 Google Play Store의 인기 앱 차트 목록을 간단히 크롤링 하는 작업을 해보기로 했다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61559772-6dcd2f00-aaa5-11e9-875d-34faf676075e.png" alt="" /></p>
+
+<p>(뱅크샐러드가 인기 앱 11위에요! 😎 <del>깨알같이 자랑…</del>)</p>
+
+<h3 id="크롤링-하고-싶은-영역-찾기">크롤링 하고 싶은 영역 찾기</h3>
+
+<p><code class="highlighter-rouge">html</code> 문서를 크롤링 하기 위해서는 원하는 html element를 선택해서 내용을 가져와야 한다. Chrome 브라우저의 <strong>개발자도구</strong>를 활용해서 원하는 내용을 포함하고 있는 element를 선택하기 위한 정보(<code class="highlighter-rouge">id</code>, <code class="highlighter-rouge">class name</code>, <code class="highlighter-rouge">tag</code>… 등을 확인할 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61559777-7160b600-aaa5-11e9-93df-5198761a3208.png" alt="" /></p>
+
+<p><code class="highlighter-rouge">class name</code> 이 details 인 <code class="highlighter-rouge">div</code> 안에 원하는 내용이 있어서 <code class="highlighter-rouge">find_elements_by_class_name</code> 함수를 활용해서 내용을 가져올 수 있었다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+
+<span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s">'./chromedriver'</span><span class="p">)</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://play.google.com/store/apps/collection/topselling_free'</span><span class="p">)</span>
+<span class="n">top_app_details</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'details'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="n">top_app_details</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>실행 결과:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 브롤스타즈
+Supercell
+2. Color Bump 3D
+Good Job Games
+3. YouTube Kids
+Google LLC
+4. CGV
+CJ CGV
+5. Netflix(넷플릭스)
+Netflix, Inc.
+6. 카카오톡 KakaoTalk
+Kakao Corporation
+7. Samsung Smart Switch Mobile
+Samsung Electronics Co., Ltd.
+8. 신비아파트 고스트헌터
+주식회사 3F FACTORY
+...
+</code></pre></div></div>
+
+<p>내용을 잘 긁어온 것을 확인할 수 있다.</p>
+
+<h3 id="카테고리-별-유료무료-인기-top-n개의-앱-리스트를-긁어오기">카테고리 별, 유료/무료 인기 top N개의 앱 리스트를 긁어오기</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+
+<span class="k">def</span> <span class="nf">crawling_top_apps</span><span class="p">(</span>
+    <span class="n">web_driver</span><span class="p">,</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">''</span><span class="p">,</span>
+    <span class="n">paid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">''</span><span class="p">,</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">):</span>
+    <span class="n">category_url</span> <span class="o">=</span> <span class="n">f</span><span class="s">'/category/{category}'</span>
+    <span class="n">free_app_rank_url</span> <span class="o">=</span> <span class="n">f</span><span class="s">'https://play.google.com/store/apps{category_url}'</span> \
+                        <span class="n">f</span><span class="s">'/collection/topselling_{paid}'</span>
+
+    <span class="n">web_driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">free_app_rank_url</span><span class="p">)</span>
+    <span class="n">top_app_details</span> <span class="o">=</span> <span class="n">web_driver</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'details'</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">app</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_app_details</span><span class="p">[:</span><span class="n">limit</span><span class="p">]):</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'. '</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">app_title</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">corp</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{idx + 1}위 {app_title} - {corp}'</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">top_n</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s">'HEALTH_AND_FITNESS'</span><span class="p">,</span>
+        <span class="s">'FINANCE'</span><span class="p">,</span>
+        <span class="s">'SHOPPING'</span>
+    <span class="p">]</span>
+    <span class="n">paid</span> <span class="o">=</span> <span class="s">'free'</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s">'./chromedriver'</span><span class="p">)</span>
+
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">'</span><span class="si">%</span><span class="s">Y-</span><span class="si">%</span><span class="s">m-</span><span class="si">%</span><span class="s">d'</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'-'</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{today} Top {top_n} {paid} Apps in {category}'</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'-'</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">crawling_top_apps</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">paid</span><span class="p">,</span> <span class="n">top_n</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>실행 결과:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>------------------------------------------------------------
+2019-02-11 Top 10 free Apps in HEALTH_AND_FITNESS
+------------------------------------------------------------
+1위 Samsung Health(삼성 헬스) - Samsung Electronics Co., Ltd.
+2위 캐시슬라이드 스텝업 - No.1 적립형 만보기앱 - NBT Inc.
+3위 M건강보험 - 국민건강보험공단
+4위 AIA Vitality x T건강걷기 - AIA Vitality (바이탈리티)
+5위 복근 운동 - 28일 이내 지방을 연소시켜 111자 복근을 만들어줍니다 - Super T Group
+6위 마이아큐브 - (주)한국존슨앤드존슨
+7위 ANT+ Plugins Service - ANT+
+8위 홈 트레이닝 - 기구가 필요 없습니다 - Leap Fitness Group
+9위 만보기 - ITO Technologies, Inc.
+10위 건강iN(건강인) - 국민건강보험공단
+------------------------------------------------------------
+2019-02-11 Top 10 free Apps in FINANCE
+------------------------------------------------------------
+1위 뱅크샐러드 - 신경 꺼도 내 돈 관리 (통합 자산관리, 자동 가계부) - Rainist Co., Ltd.
+2위 NH스마트뱅킹 - 농협BANK
+3위 카카오뱅크 - 같지만 다른 은행 - 카카오뱅크
+4위 토스 - Viva Republica
+5위 ISP/페이북 - VP Inc
+6위 KB국민은행 스타뱅킹 - KB국민은행
+7위 NH콕뱅크 - 농협BANK
+8위 터치엔 엠백신 for Web(기업용) - 라온시큐어(주)
+9위 KB국민카드 - KB KOOKMINCARD CO., LTD.
+10위 바이오인증 공동앱 - 금융결제원(KFTC)
+------------------------------------------------------------
+2019-02-11 Top 10 free Apps in SHOPPING
+------------------------------------------------------------
+1위 쿠팡 (Coupang) - 쿠팡
+2위 당근마켓 - 우리 동네 중고 직거래 벼룩장터 - 당근마켓
+3위 롯데홈쇼핑 LOTTE Homeshopping - Lotte Homeshopping
+4위 위메프 - 특가대표 (특가 / 쇼핑 / 쇼핑앱 / 쿠폰 / 배송) - 위메프
+5위 SSG.COM - SSG.COM
+6위 공구마켓 - 제이슨 컨텐츠
+7위 현대Hmall - 홈쇼핑, 백화점 - (주) 현대홈쇼핑
+8위 롯데백화점 - 롯데쇼핑
+9위 심쿵할인 - 제이슨 컨텐츠
+10위 GS SHOP - 당신의 가장 좋은 선택을 만듭니다 - GS SHOP
+</code></pre></div></div>
+
+<p>완성! (<del>금융 앱 1위는 역시 뱅크샐러드</del> 💰)</p>
+
+<p>자, 그럼 본격적으로 앱 정보, 리뷰 데이터까지 다 긁어오는 기능까지 만들자!</p>
+
+<p><em>라고 생각했지만… 크롤링 코드를 짜면서 html 요소를 찾고 값을 가져오고 하는 작업이 생각보다 귀찮았고 (-.-) 찾아보니 당연하게도 Play store 데이터를 크롤링하는 오픈소스들이 많이 있어서 바로 생각을 접었다. <del>크롤링할 영역 클릭만 하면 알아서 크롤링해주는 오픈소스 누가 만들어 주면 좋겠다.</del></em></p>
+
+<h3 id="google-login">Google login</h3>
+
+<p>뭔가 아쉬워서 Google 계정 로그인을 하는 스크립트도 만들어보았다. 로그인을 하기 위해서는 input form에 계정정보를 입력하고, 로그인 버튼을 클릭하는 동작을 지정해야한다. input form의 값은 <code class="highlighter-rouge">send_keys</code>라는 함수로 넣을 수 있고, <code class="highlighter-rouge">click</code> 함수를 사용해서 html element 요소를 click하는 액션을 지정할 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61559784-745ba680-aaa5-11e9-94a3-2fc16df528cc.png" alt="" />
+<img src="https://user-images.githubusercontent.com/16538186/61559790-79205a80-aaa5-11e9-8bfd-471d2c496539.png" alt="" /></p>
+
+<p><strong>Google 계정 로그인 프로세스</strong>는</p>
+
+<p>1) email 주소를 입력하고</p>
+
+<p>2) 다음 버튼을 클릭</p>
+
+<p>3) password 를 입력하고</p>
+
+<p>4) 다음 버튼을 클릭</p>
+
+<p>의 단계로 진행된다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">meta</span> <span class="kn">import</span> <span class="n">MY_EMAIL</span><span class="p">,</span> <span class="n">MY_PASSWORD</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s">'./chromedriver'</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://accounts.google.com/ServiceLogin?hl=ko&amp;passive=true&amp;continue=https://www.google.com/'</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">'identifier'</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">MY_EMAIL</span><span class="p">)</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">'identifierNext'</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_name</span><span class="p">(</span><span class="s">'password'</span><span class="p">)</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="n">MY_PASSWORD</span><span class="p">)</span>
+    
+    <span class="n">element</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element_by_id</span><span class="p">(</span><span class="s">'passwordNext'</span><span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s">"arguments[0].click();"</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>로그인 프로세스대로 동작을 넣고, 실행해보면 알아서 값을 넣고 로그인하는 걸 볼 수 있다.</p>
+
+<p>컴퓨터가 혼자서 내 계정에 로그인 하는걸 보고 있으면 뭔가 기분이 묘하다;</p>
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="inahjeon/devlog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/devlog/2019/02/10/web-crawling.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/devlog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/devlog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/devlog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
