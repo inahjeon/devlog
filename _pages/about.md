@@ -1,10 +1,8 @@
 ---
 layout: page
-title: About Me
+title: About
 permalink: /about/
 ---
-
-### About Me
 
 안녕하세요? 저는 [뱅크샐러드](https://banksalad.com) 서비스를 만들어 나가고 있는 `Machine Learning Engineer` 전인아입니다.
 
