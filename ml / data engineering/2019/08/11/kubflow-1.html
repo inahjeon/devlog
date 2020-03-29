@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Kubeflow on GCP (1) | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Kubeflow on GCP (1)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다." />
+<meta property="og:description" content="최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-11T14:56:00-05:00" />
+<script type="application/ld+json">
+{"description":"최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다.","headline":"Kubeflow on GCP (1)","dateModified":"2019-08-11T14:56:00-05:00","datePublished":"2019-08-11T14:56:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html"},"url":"https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/devlog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/devlog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Kubeflow on GCP (1) | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Kubeflow on GCP (1)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다." />
+<meta property="og:description" content="최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-11T14:56:00-05:00" />
+<script type="application/ld+json">
+{"description":"최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다.","headline":"Kubeflow on GCP (1)","dateModified":"2019-08-11T14:56:00-05:00","datePublished":"2019-08-11T14:56:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html"},"url":"https://inahjeon.github.io/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/devlog/">inahjeon&#39;s devlog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/devlog/about/">About Me</a><a class="page-link" href="/devlog/search/">Search</a><a class="page-link" href="/devlog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Kubeflow on GCP (1)</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-08-11T14:56:00-05:00" itemprop="datePublished">
+        Aug 11, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/devlog/categories/#ml / data engineering">ml / data engineering</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>최근에 회사에서 머신러닝 워크플로 관리를 위해 툴들을 리서치 해보고 있습니다. 그 중에서 가장 잘 알려지기도 한 kubeflow를 소개하고 간단하게 GCP에 deploy하는 것을 해보려고 합니다.</p>
+
+<blockquote>
+  <p>사실 간단한 서비스라면 AWS의 Sage Maker나 GCP의 AI Platform의 기능들을 활용해도 충분한 것 같습니다.</p>
+</blockquote>
+
+<h2 id="1-kubeflow-란">1. Kubeflow 란?</h2>
+
+<p><a href="https://www.kubeflow.org/docs/about/kubeflow/">kubeflow</a> 는 <a href="https://kubernetes.io/docs/concepts/">kubernetes</a> 에서 ML 워크플로(데이터 전처리, 모델 학습, 예측 서비스 및 서비스 관리)를 구축하기 위한 툴킷입니다.</p>
+
+<p>Kubeflow에서 제공하는 메인 기능들은 다음과 같습니다.</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">Jupyter Notebooks</code>: Using Jupyter notebooks in Kubeflow</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Hyperparameter Tuning</code>: Hyperparameter tuning of ML models in Kubeflow</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Pipelines</code>: ML Pipelines in Kubeflow</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Serving</code>: Serving of ML models in Kubeflow</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Training</code>: Training of ML models in Kubeflow</p>
+  </li>
+</ul>
+
+<h2 id="2-deploy-kubeflow-on-gcp">2. Deploy Kubeflow on GCP</h2>
+
+<p>Kubeflow document에서 <a href="https://www.kubeflow.org/docs/gke/deploy/">Kubeflow on GCP - Deploying Kubeflow</a> 라는 메뉴에 보면 GCP에서 kubeflow를 설치하는 방법을 step별로 잘 설명해 둔 문서가 있습니다.</p>
+
+<p>설치 방법은 <code class="highlighter-rouge">CLI를 이용하는 방법</code>과 kubeflow 에서 제공하는 <code class="highlighter-rouge">웹 UI를 이용하는 방법</code>이 있는데, 저는 빠르게 kubeflow를 세팅해서 써보고 싶은게 목적이라 훨씬 간편하게 할 수 있는 후자의 방법을 선택했습니다.</p>
+
+<h3 id="웹-ui를-이용해서-kubeflow-세팅하기">웹 UI를 이용해서 Kubeflow 세팅하기</h3>
+
+<p>웹 UI는 <a href="https://deploy.kubeflow.cloud/#/deploy">https://deploy.kubeflow.cloud/#/deploy</a> 링크로 들어가면 보실 수 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832330-609bfe00-bc67-11e9-834b-a5b20bc93a1b.png" alt="" /></p>
+
+<p>위와 같이 <code class="highlighter-rouge">Project id</code>, <code class="highlighter-rouge">deployment name</code>, <code class="highlighter-rouge">login 방식</code>, <code class="highlighter-rouge">GKE zone</code> 등의 설정만 선택하면 간단히 Kubernetes 위에서 돌아가는 kubeflow를 구성하실 수 있습니다. (<del>세상 편함…</del>)</p>
+
+<p>로그인 방식은 차후 kubeflow endpoint에 접근하기 위한 로그인 방식입니다.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Login with GCP Iap</code>: Oauth client를 생성하고, 구글 계정으로 로그인</li>
+  <li><code class="highlighter-rouge">Login with Username and Password</code>: 로그인할 사용자 계정과 password를 입력해서 해당 계정으로 로그인</li>
+</ul>
+
+<p>저는 GCP IAP 방식으로 설정했습니다. 이것도 <a href="https://www.kubeflow.org/docs/gke/deploy/oauth-setup/">https://www.kubeflow.org/docs/gke/deploy/oauth-setup/ 
+</a>를 보시면 쉽게 따라서 설정하실 수 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832729-1f5b1c80-bc6e-11e9-8bc2-c689324e8019.png" alt="" /></p>
+
+<p>위와 같이 적절히 원하는 설정값을 입력하고 <code class="highlighter-rouge">Create Deployment</code> 버튼을 누르면, 아래에 진행상황 창이 뜨면서 클러스터를 구성하기 시작합니다.</p>
+
+<p>클러스터 세팅까지는 <code class="highlighter-rouge">10분</code>정도, kubeflow UI에 접속가능한 endpoint가 구성되기까지는 <code class="highlighter-rouge">20분</code>정도 소요됩니다.</p>
+
+<p>아래 진행상황 창에서 다음과 같이 완료 시점도 알려줍니다.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>your kubeflow service url should be ready within 20 minutes (by 오후 7:47:29): https://kubeflow-test-1.endpoints.your-project-id.cloud.goog
+</code></pre></div></div>
+
+<h3 id="gcp---kubernetes-engine에서-클러스터-확인">GCP - Kubernetes Engine에서 클러스터 확인</h3>
+
+<p>구성된 클러스터는 GCP 콘솔의 kubernetes Engine 메뉴에서 확인할 수 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832811-609ffc00-bc6f-11e9-951c-824eac26ba54.png" alt="" /></p>
+
+<p>클러스터의 노드 풀을 확인해보면 다음과 같은 스펙으로 클러스터가 구성되어 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832813-64cc1980-bc6f-11e9-8964-4ef4249a1f31.png" alt="" /></p>
+
+<p><code class="highlighter-rouge">n1-standard-8</code> 머신 2개를 사용하고 있고 디스크는 노드 당 100GB로 설정되어 있습니다.</p>
+
+<p>(가격표는 아래 참고)</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832869-2125df80-bc70-11e9-9974-cbd477b837a9.png" alt="" /></p>
+
+<blockquote>
+  <p>클러스터 설정할 때 가까운 곳이 asia-east1 밖에 없어서 여기로 설정했는데, 타이완이었네요.</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">서비스 및 수신</code> 메뉴에서는 띄워진 서비스들을 확인할 수 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832816-7f05f780-bc6f-11e9-894c-65fba14ab374.png" alt="" /></p>
+
+<p><code class="highlighter-rouge">envoy-ingress</code> 옆에 나와있는 엔드포인트로 kubeflow UI에 접속가능합니다.</p>
+
+<p>참고로 endpoint url 형태는 
+<code class="highlighter-rouge">https://&lt;cluster-name&gt;.endpoints.&lt;gcp-product-id&gt;.cloud.goog/</code> 입니다.</p>
+
+<h2 id="3-kubeflow-ui">3. Kubeflow UI</h2>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/62832928-57b02a00-bc71-11e9-91bc-bbec128728ec.png" alt="" /></p>
+
+<p>위 엔드포인트 주소로 접속해서 클러스터를 구성할 때 설정한 로그인 방식으로 로그인하면 다음과 같은 화면을 보실 수 있습니다.</p>
+
+<p>왼쪽 메뉴는 kubeflow의 document와 제공하고 있는 기능들에 대한 대시보드들입니다.</p>
+
+<ul>
+  <li>Notebooks</li>
+  <li>TFJob Dashboard</li>
+  <li>Katib Dashboard</li>
+  <li>Pipeline Dashboard</li>
+</ul>
+
+<h2 id="맺음말">맺음말</h2>
+
+<p>이렇게 30분만에 간단히 kubeflow를 띄워봤습니다. (만세 &gt; &lt;!)</p>
+
+<p>여담이지만, 회사에서는 AWS를 주로 활용하고 있긴한데 공부할 때나 혼자 toy project를 할 때는 주로 GCP를 활용하게 되는 것 같습니다.</p>
+
+<p>인프라 쪽 지식이 별로 없는 제가 볼 때 커스텀한 설정없이 기본 설정으로 특정 서비스를 써보는 것은 AWS에 비해 GCP가 문서화가 잘 되어있고 단계 별로 스크린샷도 잘 제공하고 있어서 더 접근성이 높다고 느껴지는 것 같습니다. :)</p>
+
+<p>다음 글에서는 kubeflow의 각 기능들에 대해서 알아보고 간단한 예제 데이터를 활용해서 전체 워크플로를 한번 돌아보는 걸 해보려고 합니다.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="inahjeon/devlog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/devlog/ml%20/%20data%20engineering/2019/08/11/kubflow-1.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/devlog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/devlog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/devlog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Inah Jeon&#39;s personal blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://www.facebook.com/inahjeon5324" title="inahjeon5324"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#facebook"></use></svg></a></li><li><a rel="me" href="https://github.com/inahjeon" title="inahjeon"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

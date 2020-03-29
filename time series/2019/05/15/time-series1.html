@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Time Series Analysis &amp; Forecasting (1) | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Time Series Analysis &amp; Forecasting (1)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Time Series?" />
+<meta property="og:description" content="Time Series?" />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-15T21:45:00-05:00" />
+<script type="application/ld+json">
+{"description":"Time Series?","headline":"Time Series Analysis &amp; Forecasting (1)","dateModified":"2019-05-15T21:45:00-05:00","datePublished":"2019-05-15T21:45:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html"},"url":"https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/devlog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/devlog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Time Series Analysis &amp; Forecasting (1) | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="Time Series Analysis &amp; Forecasting (1)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Time Series?" />
+<meta property="og:description" content="Time Series?" />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-05-15T21:45:00-05:00" />
+<script type="application/ld+json">
+{"description":"Time Series?","headline":"Time Series Analysis &amp; Forecasting (1)","dateModified":"2019-05-15T21:45:00-05:00","datePublished":"2019-05-15T21:45:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html"},"url":"https://inahjeon.github.io/devlog/time%20series/2019/05/15/time-series1.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/devlog/">inahjeon&#39;s devlog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/devlog/about/">About Me</a><a class="page-link" href="/devlog/search/">Search</a><a class="page-link" href="/devlog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Time Series Analysis &amp; Forecasting (1)</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-05-15T21:45:00-05:00" itemprop="datePublished">
+        May 15, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/devlog/categories/#time series">time series</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="time-series">Time Series?</h2>
+
+<p>Time series (시계열) 데이터는 연도별(annual), 분기별(quarterly), 월별(monthly), 일별(daily) 또는 시간별(hourly) 등 시간의 경과(흐름)에 따라 순서대로(ordered in time) 관측되는 데이터입니다.</p>
+
+<h3 id="time-series-데이터의-예시">Time series 데이터의 예시:</h3>
+
+<ul>
+  <li>국민 총 생산액, 물가지수, 주가지수 등과 같이 경제활동과 관련된 시계열 (economic time series)</li>
+  <li>일일 강수량, 기온, 연간 지진의 발생 수 등과 같이 물리적 현상과 관련된 시계열 (physical time series)</li>
+  <li>상품판매량, 상품재고량, 상품매출액 등 회사의 경영활동과 관련된 시계열 (marketing time series)</li>
+  <li>총인구, 농가 수, 인구증가율, 평균결혼연령 등과 같이 인구와 관련된 시계열 (demographic time series)</li>
+  <li>품질관리 등과 같은 생산관리와 관련된 시계열(time series in process control)</li>
+  <li>확률과정, 음성파와 같이 통신 공학 또는 공학과 관련된 시계열</li>
+  <li>월별 교통사고 건수, 월별 범죄 발생 수와 같이 사회생활과 관련된 시계열</li>
+</ul>
+
+<p>연속적으로 생성되는 연속시계열(continuous time series)과 이산적 시점에서 생성되는 이산시계열(discrete time series)로 구분할 수 있습니다. 많은 시계열들이 연속적으로 생성되고 있지만 일정한 시차를 두고 관측되므로 이산시계열의 형태를 지니는 경우가 많습니다.</p>
+
+<p>시계열자료(time series data)들은 시간의 경과에 따라 관측된 자료이므로 시간에 영향을 받습니다. 시계열자료를 분석할 때 관측 시점들 간의 시차(time lag)가 중요한 역할을 합니다.
+예를 들어, 오늘의 주가가 한달 전, 일주일 전의 주가보다는 어제의 주가에 더 많은 영향을 받는 것과 마찬가지로 가까운 관측 시점일수록 관측 자료들 간에 상관관계가 커집니다.</p>
+
+<h2 id="time-series-analysis의-목적">Time Series Analysis의 목적</h2>
+
+<h3 id="modeling">Modeling</h3>
+
+<ul>
+  <li>시계열자료가 생성된 시스템 또는 확률과정을 모형화하여 과정을 이해하고 제어(control)합니다.</li>
+  <li>예) 여름기간 동안의 시간 당 전기 수요(ED, electricity demand)에 대해 모형화하고 변동 요소(현재 기온, 인구, 시간, 요일 등)들을 제어하여 전기 수요량에 대해 시뮬레이션</li>
+</ul>
+
+<h3 id="forecasting">Forecasting</h3>
+
+<ul>
+  <li>과거 시계열자료의 패턴(pattern)이 미래에도 지속적으로 유지된다는 가정하에, 시계열 데이터 모델링을 통해 미래 시점을 예측(Forecasting)합니다.</li>
+  <li>예) 어떤 상품의 매출액 자료를 분석하여 미래의 매출액을 예측</li>
+</ul>
+
+<h2 id="components-of-time-series">Components of Time Series</h2>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558650-9d2e6c80-aaa2-11e9-957b-d9bf12eee010.png" alt="" /></p>
+
+<ul>
+  <li>Trend (추세)</li>
+  <li>Cycle (주기성)</li>
+  <li>Seasonality (계절성)</li>
+  <li>Random Variation (불규칙 변동)</li>
+</ul>
+
+<h3 id="trend">Trend</h3>
+
+<ul>
+  <li>장기간에 걸쳐 지속적으로 증가 또는 감소하거나 일정한 상태를 유지하려는 패턴입니다.</li>
+  <li>Trend를 이용한 데이터 추정: 시간 t에 대한 추세 함수 f(t)와 정상 확률 과정 x(t)로 표현될 수 있습니다.</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558716-bf27ef00-aaa2-11e9-8ad6-286228ac2253.png" alt="" /></p>
+
+<h3 id="cycle">Cycle</h3>
+
+<ul>
+  <li>시간의 경과(흐름)에 따라 고정된 빈도가 아닌 형태로 상하로 반복되는 변동하는 패턴입니다.</li>
+  <li>추세변동은 장기적으로(일반적으로 1년 초과) 나타나는 추세경향이지만, 순환변동은 대체로 2년 이상의 기간을 주기로 순환적으로 나타납니다. (ex. 경기순환)</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558746-d4048280-aaa2-11e9-9899-e9b30c5612d3.png" alt="" /></p>
+
+<h3 id="seasonality">Seasonality</h3>
+
+<ul>
+  <li>해마다 어떤 특정한 때나 1주일마다 특정 요일 등의 계절성 요인이 시계열에 영향을 줄 때 나타나는 패턴입니다.</li>
+  <li>계절성은 항상 알려진 상수 빈도 형태입니다.</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558779-f4ccd800-aaa2-11e9-8cca-b55578eb672e.png" alt="" /></p>
+
+<h3 id="random-variation">Random Variation</h3>
+
+<ul>
+  <li>시간에 따른 규칙적인 움직임과는 무관하게 랜덤한 원인에 의한 변동성분입니다.</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558818-1037e300-aaa3-11e9-92c5-41814e3c0012.png" alt="" /></p>
+
+<h2 id="stationary-vs-non-stationary">Stationary vs Non-Stationary</h2>
+
+<h3 id="stationary">Stationary</h3>
+<ul>
+  <li>시계열 데이터의 통계적 특성(mean, variable,..)이 시간의 흐름에 따라 변하지 않을 때 stationary 라고 말합니다.</li>
+</ul>
+
+<h3 id="non-stationary">Non-Stationary</h3>
+<ul>
+  <li>시계열 데이터의 통계적 특성(mean, variable,..)이 시간의 흐름에 따라 변할 때를 말합니다.</li>
+  <li>많은 시계열 모델링 기법들에서 데이터가 stationary라고 가정하기 때문에, 모델링에 앞서 Non-Stationary 한 데이터를 Stationary 한 데이터로 변형합니다.</li>
+</ul>
+
+<h2 id="non-stationary-to-stationary">Non-Stationary to Stationary</h2>
+
+<h3 id="differencing-차분">Differencing (차분)</h3>
+<ul>
+  <li>주로 trend, seasonality를 가지는 시계열 데이터의 경우 활용합니다.</li>
+  <li>Differencing: y′t=yt−yt−1.</li>
+  <li>Seasonality differencing: y′t=yt−yt−m (m: seasonality 의 주기)</li>
+  <li>언제 적용해야하는가? Dicker-Fuller Test로 검증</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558838-1e85ff00-aaa3-11e9-998a-d62efa2c09c9.png" alt="" /></p>
+
+<h3 id="transformation">Transformation</h3>
+<ul>
+  <li>주로 분산이 커지는 경우 Log 변환을 취하여 안정화 시킬 수 있습니다.</li>
+  <li>분산이 줄어드는 경우는 특정 점으로 수렴함을 의미하므로 모델링이 불필요합니다.</li>
+</ul>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558875-3a89a080-aaa3-11e9-99d2-a7fd1df54e29.png" alt="" /></p>
+
+<h3 id="전체-변형-적용-예시">전체 변형 적용 예시</h3>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/61558896-4b3a1680-aaa3-11e9-8073-7e5b8c395ce1.png" alt="" /></p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="inahjeon/devlog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/devlog/time%20series/2019/05/15/time-series1.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/devlog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/devlog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/devlog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Inah Jeon&#39;s personal blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://www.facebook.com/inahjeon5324" title="inahjeon5324"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#facebook"></use></svg></a></li><li><a rel="me" href="https://github.com/inahjeon" title="inahjeon"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

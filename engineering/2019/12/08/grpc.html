@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>gRPC | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="gRPC" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다." />
+<meta property="og:description" content="tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-08T19:55:00-06:00" />
+<script type="application/ld+json">
+{"description":"tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다.","headline":"gRPC","dateModified":"2019-12-08T19:55:00-06:00","datePublished":"2019-12-08T19:55:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html"},"url":"https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/devlog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/devlog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>gRPC | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="gRPC" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다." />
+<meta property="og:description" content="tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-12-08T19:55:00-06:00" />
+<script type="application/ld+json">
+{"description":"tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다.","headline":"gRPC","dateModified":"2019-12-08T19:55:00-06:00","datePublished":"2019-12-08T19:55:00-06:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html"},"url":"https://inahjeon.github.io/devlog/engineering/2019/12/08/grpc.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/devlog/">inahjeon&#39;s devlog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/devlog/about/">About Me</a><a class="page-link" href="/devlog/search/">Search</a><a class="page-link" href="/devlog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">gRPC</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-12-08T19:55:00-06:00" itemprop="datePublished">
+        Dec 8, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/devlog/categories/#engineering">engineering</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다.</p>
+
+<h2 id="grpc">gRPC</h2>
+
+<p>RPC는 RPC(Remote Procedure Call)는 원격 컴퓨터나 프로세스에 존재하는 함수를 호출하는데 사용하는 프로토콜입니다. 원격에 있는 함수를 동일 프로세스에 존재하는 함수를 호출하는 것 처럼 직접 호출할 수 있습니다. gRPC는 Google 의 RPC 구현체입니다.</p>
+
+<p><img src="https://grpc.io/img/landing-2.svg" alt="" /></p>
+
+<p>기본적으로 gRPC는 서비스 인터페이스와 메시지의 구조를 모두 설명하기 위해 ProtoBuf 를 IDL (Interface Definition Language)로 사용합니다. ProtoBuf는 구글에서 만들고 사용하는 데이터 직렬화 라이브러리 입니다. IDL로 정의된 메시지를 기반으로 protoc 라는 컴파일러를 사용해서 원하는 언어의 코드를 생성할 수 있습니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/70392696-06008c00-1a26-11ea-9a29-fad25234550c.png" alt="" />
+(gRPC와 JSON을 사용 하는 HTTP Api 간 비교표)</p>
+
+<p>gRPC에 대한 더 자세한 소개와 장점에 대해서는 <a href="https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d">https://medium.com/@goinhacker/microservices-with-grpc-d504133d191d</a> 에 잘 설명되어있습니다.</p>
+
+<h2 id="tutorial">Tutorial</h2>
+
+<p><a href="https://github.com/grpc/grpc/tree/v1.25.0/examples/python/route_guide">https://github.com/grpc/grpc/tree/v1.25.0/examples/python/route_guide</a> 을 참고하여 간단한 예제를 만들어보았습니다.</p>
+
+<p>먼저 필요한 라이브러리 설치를 위해 아래와 같이 <code class="highlighter-rouge">grpcio-tools</code> 를 설치해 줍니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install grpcio-tools
+</code></pre></div></div>
+
+<p>예제에서는 gRPC 통신을 통해 두 수의 합을 구해주는 서비스를 제공하는 서버와, 클라이언트를 구현합니다.</p>
+
+<h3 id="serviceproto">service.proto</h3>
+
+<p>먼저 protos 디렉토리 아래 <code class="highlighter-rouge">service.proto</code>라는 파일을 만들어서 두 수의 합을 구하는 서비스의 인터페이스와 message의 형태를 정의합니다.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">syntax</span> <span class="o">=</span> <span class="s">"proto3"</span><span class="p">;</span>
+
+<span class="k">package</span> <span class="n">test</span><span class="p">;</span>
+
+<span class="n">service</span> <span class="n">Test</span> <span class="p">{</span>
+  <span class="n">rpc</span> <span class="n">GetSum</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span> <span class="n">returns</span> <span class="p">(</span><span class="n">Sum</span><span class="p">)</span> <span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">message</span> <span class="n">Data</span> <span class="p">{</span>
+  <span class="kt">int32</span> <span class="n">a</span> <span class="o">=</span> <span class="m">1</span><span class="p">;</span>
+  <span class="kt">int32</span> <span class="n">b</span> <span class="o">=</span> <span class="m">2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">message</span> <span class="n">Sum</span> <span class="p">{</span>
+  <span class="kt">int32</span> <span class="n">sum</span> <span class="o">=</span> <span class="m">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>다음에서 구현할 서버와 클라이언트에서 위 service.proto 에 명세 대로 gRPC를 이용하여 통신하게 됩니다.</p>
+
+<h3 id="run_codegenpy">run_codegen.py</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">grpc_tools</span> <span class="kn">import</span> <span class="n">protoc</span>
+
+<span class="n">protoc</span><span class="o">.</span><span class="n">main</span><span class="p">((</span>
+    <span class="s">''</span><span class="p">,</span>
+    <span class="s">'-Iprotos'</span><span class="p">,</span>
+    <span class="s">'--python_out=python_out'</span><span class="p">,</span>
+    <span class="s">'--grpc_python_out=python_out'</span><span class="p">,</span>
+    <span class="s">'protos/service.proto'</span><span class="p">,</span>
+<span class="p">))</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">protos/service.proto</code> 에 정의된 명세대로 python stub 코드를 <code class="highlighter-rouge">python_out</code> 이라는 디렉토리에 생성해주는 코드입니다.</p>
+
+<p>run_codegen.py 을 통해 만들어지는 코드는 다음과 같습니다.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">python_out/service_pb2.py</code></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># -*- coding: utf-8 -*-
+# Generated by the protocol buffer compiler.  DO NOT EDIT!
+# source: service.proto
+</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">_b</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">3</span> <span class="ow">and</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'latin1'</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">descriptor</span> <span class="k">as</span> <span class="n">_descriptor</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">message</span> <span class="k">as</span> <span class="n">_message</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">reflection</span> <span class="k">as</span> <span class="n">_reflection</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">symbol_database</span> <span class="k">as</span> <span class="n">_symbol_database</span>
+<span class="c1"># @@protoc_insertion_point(imports)
+</span>
+<span class="n">_sym_db</span> <span class="o">=</span> <span class="n">_symbol_database</span><span class="o">.</span><span class="n">Default</span><span class="p">()</span>
+
+
+
+
+<span class="n">DESCRIPTOR</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">FileDescriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'service.proto'</span><span class="p">,</span>
+  <span class="n">package</span><span class="o">=</span><span class="s">'test'</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">serialized_pb</span><span class="o">=</span><span class="n">_b</span><span class="p">(</span><span class="s">'</span><span class="se">\n\r</span><span class="s">service.proto</span><span class="se">\x12\x04</span><span class="s">test</span><span class="se">\"\x1c\n\x04\x44\x61</span><span class="s">ta</span><span class="se">\x12\t\n\x01\x61\x18\x01</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\x12\t\n\x01\x62\x18\x02</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\"\x12\n\x03</span><span class="s">Sum</span><span class="se">\x12\x0b\n\x03</span><span class="s">sum</span><span class="se">\x18\x01</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\x32</span><span class="s">)</span><span class="se">\n\x04</span><span class="s">Test</span><span class="se">\x12</span><span class="s">!</span><span class="se">\n\x06</span><span class="s">GetSum</span><span class="se">\x12\n</span><span class="s">.test.Data</span><span class="se">\x1a\t</span><span class="s">.test.Sum</span><span class="se">\"\x00\x62\x06</span><span class="s">proto3'</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+
+
+<span class="n">_DATA</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Data'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data'</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'a'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data.a'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data.b'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+  <span class="p">],</span>
+  <span class="n">extensions</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">nested_types</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">enum_types</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">is_extendable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">extension_ranges</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">oneofs</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">51</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">_SUM</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Sum'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Sum'</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'sum'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Sum.sum'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+  <span class="p">],</span>
+  <span class="n">extensions</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">nested_types</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">enum_types</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">is_extendable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">extension_ranges</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">oneofs</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">53</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">message_types_by_name</span><span class="p">[</span><span class="s">'Data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DATA</span>
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">message_types_by_name</span><span class="p">[</span><span class="s">'Sum'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_SUM</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterFileDescriptor</span><span class="p">(</span><span class="n">DESCRIPTOR</span><span class="p">)</span>
+
+<span class="n">Data</span> <span class="o">=</span> <span class="n">_reflection</span><span class="o">.</span><span class="n">GeneratedProtocolMessageType</span><span class="p">(</span><span class="s">'Data'</span><span class="p">,</span> <span class="p">(</span><span class="n">_message</span><span class="o">.</span><span class="n">Message</span><span class="p">,),</span> <span class="p">{</span>
+  <span class="s">'DESCRIPTOR'</span> <span class="p">:</span> <span class="n">_DATA</span><span class="p">,</span>
+  <span class="s">'__module__'</span> <span class="p">:</span> <span class="s">'service_pb2'</span>
+  <span class="c1"># @@protoc_insertion_point(class_scope:test.Data)
+</span>  <span class="p">})</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterMessage</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+
+<span class="n">Sum</span> <span class="o">=</span> <span class="n">_reflection</span><span class="o">.</span><span class="n">GeneratedProtocolMessageType</span><span class="p">(</span><span class="s">'Sum'</span><span class="p">,</span> <span class="p">(</span><span class="n">_message</span><span class="o">.</span><span class="n">Message</span><span class="p">,),</span> <span class="p">{</span>
+  <span class="s">'DESCRIPTOR'</span> <span class="p">:</span> <span class="n">_SUM</span><span class="p">,</span>
+  <span class="s">'__module__'</span> <span class="p">:</span> <span class="s">'service_pb2'</span>
+  <span class="c1"># @@protoc_insertion_point(class_scope:test.Sum)
+</span>  <span class="p">})</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterMessage</span><span class="p">(</span><span class="n">Sum</span><span class="p">)</span>
+
+
+
+<span class="n">_TEST</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">ServiceDescriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Test'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Test'</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">114</span><span class="p">,</span>
+  <span class="n">methods</span><span class="o">=</span><span class="p">[</span>
+  <span class="n">_descriptor</span><span class="o">.</span><span class="n">MethodDescriptor</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">'GetSum'</span><span class="p">,</span>
+    <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Test.GetSum'</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">containing_service</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">input_type</span><span class="o">=</span><span class="n">_DATA</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="n">_SUM</span><span class="p">,</span>
+    <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="p">),</span>
+<span class="p">])</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterServiceDescriptor</span><span class="p">(</span><span class="n">_TEST</span><span class="p">)</span>
+
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">services_by_name</span><span class="p">[</span><span class="s">'Test'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_TEST</span>
+
+<span class="c1"># @@protoc_insertion_point(module_scope)
+</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">python_out/service_pb2_grpc.py</code></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># -*- coding: utf-8 -*-
+# Generated by the protocol buffer compiler.  DO NOT EDIT!
+# source: service.proto
+</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">_b</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">3</span> <span class="ow">and</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'latin1'</span><span class="p">))</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">descriptor</span> <span class="k">as</span> <span class="n">_descriptor</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">message</span> <span class="k">as</span> <span class="n">_message</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">reflection</span> <span class="k">as</span> <span class="n">_reflection</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="kn">import</span> <span class="n">symbol_database</span> <span class="k">as</span> <span class="n">_symbol_database</span>
+<span class="c1"># @@protoc_insertion_point(imports)
+</span>
+<span class="n">_sym_db</span> <span class="o">=</span> <span class="n">_symbol_database</span><span class="o">.</span><span class="n">Default</span><span class="p">()</span>
+
+
+
+
+<span class="n">DESCRIPTOR</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">FileDescriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'service.proto'</span><span class="p">,</span>
+  <span class="n">package</span><span class="o">=</span><span class="s">'test'</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">serialized_pb</span><span class="o">=</span><span class="n">_b</span><span class="p">(</span><span class="s">'</span><span class="se">\n\r</span><span class="s">service.proto</span><span class="se">\x12\x04</span><span class="s">test</span><span class="se">\"\x1c\n\x04\x44\x61</span><span class="s">ta</span><span class="se">\x12\t\n\x01\x61\x18\x01</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\x12\t\n\x01\x62\x18\x02</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\"\x12\n\x03</span><span class="s">Sum</span><span class="se">\x12\x0b\n\x03</span><span class="s">sum</span><span class="se">\x18\x01</span><span class="s"> </span><span class="se">\x01</span><span class="s">(</span><span class="se">\x05\x32</span><span class="s">)</span><span class="se">\n\x04</span><span class="s">Test</span><span class="se">\x12</span><span class="s">!</span><span class="se">\n\x06</span><span class="s">GetSum</span><span class="se">\x12\n</span><span class="s">.test.Data</span><span class="se">\x1a\t</span><span class="s">.test.Sum</span><span class="se">\"\x00\x62\x06</span><span class="s">proto3'</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+
+
+<span class="n">_DATA</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Data'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data'</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'a'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data.a'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Data.b'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+  <span class="p">],</span>
+  <span class="n">extensions</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">nested_types</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">enum_types</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">is_extendable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">extension_ranges</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">oneofs</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">23</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">51</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">_SUM</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Sum'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Sum'</span><span class="p">,</span>
+  <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">_descriptor</span><span class="o">.</span><span class="n">FieldDescriptor</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="s">'sum'</span><span class="p">,</span> <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Sum.sum'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cpp_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+      <span class="n">has_default_value</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+      <span class="n">message_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">enum_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">containing_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">is_extension</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extension_scope</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+      <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">),</span>
+  <span class="p">],</span>
+  <span class="n">extensions</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">nested_types</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">enum_types</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">is_extendable</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">syntax</span><span class="o">=</span><span class="s">'proto3'</span><span class="p">,</span>
+  <span class="n">extension_ranges</span><span class="o">=</span><span class="p">[],</span>
+  <span class="n">oneofs</span><span class="o">=</span><span class="p">[</span>
+  <span class="p">],</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">53</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">71</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">message_types_by_name</span><span class="p">[</span><span class="s">'Data'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DATA</span>
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">message_types_by_name</span><span class="p">[</span><span class="s">'Sum'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_SUM</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterFileDescriptor</span><span class="p">(</span><span class="n">DESCRIPTOR</span><span class="p">)</span>
+
+<span class="n">Data</span> <span class="o">=</span> <span class="n">_reflection</span><span class="o">.</span><span class="n">GeneratedProtocolMessageType</span><span class="p">(</span><span class="s">'Data'</span><span class="p">,</span> <span class="p">(</span><span class="n">_message</span><span class="o">.</span><span class="n">Message</span><span class="p">,),</span> <span class="p">{</span>
+  <span class="s">'DESCRIPTOR'</span> <span class="p">:</span> <span class="n">_DATA</span><span class="p">,</span>
+  <span class="s">'__module__'</span> <span class="p">:</span> <span class="s">'service_pb2'</span>
+  <span class="c1"># @@protoc_insertion_point(class_scope:test.Data)
+</span>  <span class="p">})</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterMessage</span><span class="p">(</span><span class="n">Data</span><span class="p">)</span>
+
+<span class="n">Sum</span> <span class="o">=</span> <span class="n">_reflection</span><span class="o">.</span><span class="n">GeneratedProtocolMessageType</span><span class="p">(</span><span class="s">'Sum'</span><span class="p">,</span> <span class="p">(</span><span class="n">_message</span><span class="o">.</span><span class="n">Message</span><span class="p">,),</span> <span class="p">{</span>
+  <span class="s">'DESCRIPTOR'</span> <span class="p">:</span> <span class="n">_SUM</span><span class="p">,</span>
+  <span class="s">'__module__'</span> <span class="p">:</span> <span class="s">'service_pb2'</span>
+  <span class="c1"># @@protoc_insertion_point(class_scope:test.Sum)
+</span>  <span class="p">})</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterMessage</span><span class="p">(</span><span class="n">Sum</span><span class="p">)</span>
+
+
+
+<span class="n">_TEST</span> <span class="o">=</span> <span class="n">_descriptor</span><span class="o">.</span><span class="n">ServiceDescriptor</span><span class="p">(</span>
+  <span class="n">name</span><span class="o">=</span><span class="s">'Test'</span><span class="p">,</span>
+  <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Test'</span><span class="p">,</span>
+  <span class="nb">file</span><span class="o">=</span><span class="n">DESCRIPTOR</span><span class="p">,</span>
+  <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+  <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="n">serialized_start</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span>
+  <span class="n">serialized_end</span><span class="o">=</span><span class="mi">114</span><span class="p">,</span>
+  <span class="n">methods</span><span class="o">=</span><span class="p">[</span>
+  <span class="n">_descriptor</span><span class="o">.</span><span class="n">MethodDescriptor</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">'GetSum'</span><span class="p">,</span>
+    <span class="n">full_name</span><span class="o">=</span><span class="s">'test.Test.GetSum'</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">containing_service</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">input_type</span><span class="o">=</span><span class="n">_DATA</span><span class="p">,</span>
+    <span class="n">output_type</span><span class="o">=</span><span class="n">_SUM</span><span class="p">,</span>
+    <span class="n">serialized_options</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+  <span class="p">),</span>
+<span class="p">])</span>
+<span class="n">_sym_db</span><span class="o">.</span><span class="n">RegisterServiceDescriptor</span><span class="p">(</span><span class="n">_TEST</span><span class="p">)</span>
+
+<span class="n">DESCRIPTOR</span><span class="o">.</span><span class="n">services_by_name</span><span class="p">[</span><span class="s">'Test'</span><span class="p">]</span> <span class="o">=</span> <span class="n">_TEST</span>
+
+<span class="c1"># @@protoc_insertion_point(module_scope)
+</span>
+</code></pre></div></div>
+
+<p>server 와 client 코드에서 위 모듈을 불러와서 사용하게 됩니다.</p>
+
+<h3 id="serverpy">server.py</h3>
+
+<p>서버 코드를 아래와 같이 구현합니다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
+
+<span class="kn">import</span> <span class="nn">grpc</span>
+
+<span class="kn">from</span> <span class="nn">python_out.service_pb2</span> <span class="kn">import</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Sum</span>
+<span class="kn">import</span> <span class="nn">python_out.service_pb2_grpc</span> <span class="k">as</span> <span class="n">service_pb2_grpc</span>
+
+
+<span class="k">class</span> <span class="nc">TestServicer</span><span class="p">(</span><span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">TestServicer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">GetSum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Sum</span><span class="p">(</span><span class="nb">sum</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="n">request</span><span class="o">.</span><span class="n">b</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">serve</span><span class="p">():</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">server</span><span class="p">(</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">add_TestServicer_to_server</span><span class="p">(</span>
+        <span class="n">TestServicer</span><span class="p">(),</span> <span class="n">server</span>
+    <span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">add_insecure_port</span><span class="p">(</span><span class="s">'[::]:50051'</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">wait_for_termination</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">serve</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">service_pb2_grpc.py</code> 에 정의된 stub class TestServicer 를 상속받아서 <code class="highlighter-rouge">service.proto</code> 에 정의했던 <code class="highlighter-rouge">rpc GetSum(Data) returns (Sum) {}</code> 의 실제 동작 부분을 구현해주면 됩니다. 그리고 <code class="highlighter-rouge">serve()</code> 에서 서버를 실행시켜줍니다.
+server.py 코드를 실행하면 서버가 실행됩니다.</p>
+
+<h3 id="clientpy">client.py</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">grpc</span>
+
+
+<span class="kn">import</span> <span class="nn">python_out.service_pb2</span> <span class="k">as</span> <span class="n">service_pb2</span>
+<span class="kn">import</span> <span class="nn">python_out.service_pb2_grpc</span> <span class="k">as</span> <span class="n">service_pb2_grpc</span>
+
+
+<span class="k">def</span> <span class="nf">get_sum</span><span class="p">(</span><span class="n">stub</span><span class="p">:</span> <span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">TestStub</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">stub</span><span class="o">.</span><span class="n">GetSum</span><span class="p">(</span><span class="n">service_pb2</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">"Received sum: {response}"</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+    <span class="k">with</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span><span class="s">'localhost:50051'</span><span class="p">)</span> <span class="k">as</span> <span class="n">channel</span><span class="p">:</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">service_pb2_grpc</span><span class="o">.</span><span class="n">TestStub</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"-------------- Get Sum --------------"</span><span class="p">)</span>
+        <span class="n">get_sum</span><span class="p">(</span><span class="n">stub</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>다음은 server에 요청을 보내서 두 수의 합을 구하는 client 코드입니다. <code class="highlighter-rouge">service_pb2_grpc</code> 에 선언된 stub class를 이용해서 GetSum 함수를 호출하고 인자로 <code class="highlighter-rouge">service_pb2</code> 에 정의된 <code class="highlighter-rouge">Data</code> class 의 인스턴스를 넘깁니다. 그리고 response 값으로 두 수의 합을 받아옵니다.
+client 코드를 실행하면 다음과 같은 결과를 얻을 수 있습니다.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">--------------</span> Get Sum <span class="nt">--------------</span>
+Received <span class="nb">sum</span>: <span class="nb">sum</span>: 3
+</code></pre></div></div>
+
+<p>예제는 크게 어렵지 않았는데, gRPC의 개념에 대해서는 익숙하지 않아 이해하기 좀 어려웠습니다. 그렇지만 예제를 한번 작성해보고 나니, 개념과 장점에 대해서 좀 더 잘 와닿았던 것 같습니다. 다음에는 tensorflow serving 에서 제공하는 gRPC 통신으로 변경 시 성능 변화가 얼마나 있는지 테스트 해보려고 합니다.</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="inahjeon/devlog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/devlog/engineering/2019/12/08/grpc.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/devlog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/devlog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/devlog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Inah Jeon&#39;s personal blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://www.facebook.com/inahjeon5324" title="inahjeon5324"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#facebook"></use></svg></a></li><li><a rel="me" href="https://github.com/inahjeon" title="inahjeon"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
