@@ -2,7 +2,7 @@
 layout: post
 title:  "Deview 2018 Day2 세션 정리"
 date:   2018-10-12 17:14:00
-tags: [conference]
+categories: [conference]
 comments: true
 ---
 

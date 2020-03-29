@@ -2,7 +2,7 @@
 layout: post
 title:  "글또 4기를 시작하며"
 date:   2020-03-01 15:25:00
-tags: [diary]
+categories: [diary]
 comments: true
 ---
 

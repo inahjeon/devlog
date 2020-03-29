@@ -2,7 +2,7 @@
 layout: post
 title:  "글또를 시작하며"
 date:   2018-11-11 15:36:00
-tags: [diary]
+categories: [diary]
 comments: true
 ---
 

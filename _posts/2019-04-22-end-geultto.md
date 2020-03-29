@@ -2,7 +2,7 @@
 layout: post
 title:  "글또를 끝내며"
 date:   2019-04-22 00:36:00
-tags: [diary]
+categories: [diary]
 comments: true
 ---
 

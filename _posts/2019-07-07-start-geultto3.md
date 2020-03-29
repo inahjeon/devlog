@@ -2,7 +2,7 @@
 layout: post
 title:  "글또 3기를 시작하며"
 date:   2019-07-07 23:59:00
-tags: [diary]
+categories: [diary]
 comments: true
 ---
 

@@ -2,7 +2,7 @@
 layout: post
 title:  "Google Cloud Summit 2018"
 date:   2018-11-04 23:14:00
-tags: [conference]
+categories: [conference]
 comments: true
 ---
 
