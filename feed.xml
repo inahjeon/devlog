@@ -1,4 +1,221 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://inahjeon.github.io/devlog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://inahjeon.github.io/devlog/" rel="alternate" type="text/html" /><updated>2020-04-29T08:42:01-05:00</updated><id>https://inahjeon.github.io/devlog/feed.xml</id><title type="html">inahjeon’s devlog</title><subtitle>Inah Jeon's personal blog</subtitle><entry><title type="html">내맘대로 뉴스 요약 큐레이션 (1) - 시작 그리고 뉴스 크롤링</title><link href="https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html" rel="alternate" type="text/html" title="내맘대로 뉴스 요약 큐레이션 (1) - 시작 그리고 뉴스 크롤링" /><published>2020-04-26T00:00:00-05:00</published><updated>2020-04-26T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1</id><content type="html" xml:base="https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html">&lt;!--
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://inahjeon.github.io/devlog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://inahjeon.github.io/devlog/" rel="alternate" type="text/html" /><updated>2020-05-24T08:01:01-05:00</updated><id>https://inahjeon.github.io/devlog/feed.xml</id><title type="html">inahjeon’s devlog</title><subtitle>Inah Jeon's personal blog</subtitle><entry><title type="html">내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기</title><link href="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" rel="alternate" type="text/html" title="내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기" /><published>2020-05-24T00:00:00-05:00</published><updated>2020-05-24T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2</id><content type="html" xml:base="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html">&lt;p&gt;데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;0-어떻게-만들어-볼까&quot;&gt;0. 어떻게 만들어 볼까?&lt;/h2&gt;
+
+&lt;p&gt;개인 aws 계정을 사용할 예정이기 때문에, 다른건 다 필요없고 가장 저렴하게 자동화된 데이터 수집 파이프라인을 만들고 싶었다.&lt;/p&gt;
+
+&lt;p&gt;찾아보니 AWS Cloud watch Event Trigger -&amp;gt; Lambda function -&amp;gt; S3에 저장 으로 하는것이 가장 경제적이라 카더라는 얘기가 많아서 이렇게 만들어보기로 했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;1-aws-lambda-function-만들기&quot;&gt;1. AWS Lambda Function 만들기&lt;/h2&gt;
+
+&lt;p&gt;Lambda 함수를 만들러 가보자.&lt;/p&gt;
+
+&lt;p&gt;Lambda 서비스에서 함수 생성 기능을 누르면 아래와 같이 만들려는 함수 이름, 런타임, 권한에 대해서 지정할 수 있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753054-ae03e900-9dfd-11ea-8fca-fdb93b8d1fa6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;런타임은 나중에 필요한 selenium + chromium 때문에 python 3.6 버전으로 설정했다.&lt;/p&gt;
+
+&lt;p&gt;함수생성을 하면 아래와 같은 화면을 볼 수 있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753076-db509700-9dfd-11ea-9416-d33eb300dad6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;트리거 추가에서 lambda function 을 실행할 때 필요한 trigger 를 추가할 수 있고, 함수 코드 영역에 실행할 코드를 직접 작성하거나, 압축된 실행 파일을 업로드할 수 있다.&lt;/p&gt;
+
+&lt;h3 id=&quot;1-layers-에-selenium--chromium-패키지-찾아서-올리기&quot;&gt;1) Layers 에 Selenium + Chromium 패키지 찾아서 올리기&lt;/h3&gt;
+
+&lt;p&gt;예전에는 lambda 코드에서 python 기본 라이브러리 외 다른 라이브러리를 사용하는 경우, 스크립트 코드와 스크립트에 필요한 파이썬 패키지파일들을 모두 한데모아…. zip으로 압축해서 올려주어야 했다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753283-74cc7880-9dff-11ea-8244-5664537a9304.png&quot; alt=&quot;&quot; /&gt;
+(lambda_function.zip…)&lt;/p&gt;
+
+&lt;p&gt;그런데 최근에는 &lt;code class=&quot;highlighter-rouge&quot;&gt;Layers&lt;/code&gt; 라는 기능이 추가되어서 필요한 패키지 파일을 따로 Layer에 넣어둘 수 있고, 스크립트 코드에서 Layer 에 있는 패키지를 import 할 수 있도록 분리되었다. (&lt;del&gt;오예!&lt;/del&gt;)&lt;/p&gt;
+
+&lt;p&gt;사실 예전에 lambda 함수를 써보려고 할 때 테스트 환경이 불편해서 잘 쓰지 못했었다. 특히 외부 라이브러리를 쓰는 경우나, lambda 실행 환경에서 크롤링에 필요한 headless chrome driver를 테스트 해보는 경우 더더욱 시간이 많이 들고 어려웠다.
+그런데 Layers 기능이 생기면서 Layer에 필요한 패키지를 올려두고 스크립트 코드만 작성할 수 있게 되어서 빠른 테스트도 가능해졌다.&lt;/p&gt;
+
+&lt;p&gt;찾아보니 로컬에서 테스트할 때는 AWS lambda 의 실행환경에 맞춘 &lt;a href=&quot;https://github.com/lambci&quot;&gt;lambci&lt;/a&gt; 에서 제공하는 docker 이미지 파일로 테스트 해볼 순 있다고 한다. 하지만 그냥 바로 editor 에서 테스트하는게 제일 편하다.&lt;/p&gt;
+
+&lt;p&gt;그러면 나에게 필요한 건 크롤링 코드를 돌리기 위한 selenium + chrome driver Layer 가 필요하다.&lt;/p&gt;
+
+&lt;p&gt;lambda 를 이용해서 selenium 으로 크롤링하는 건 이전에 매우 많은 훌륭하신 분들이 많은 삽질을 해 두었을 것이므로, 열심히 구글링해보니 바로 구할 수 있었다.&lt;/p&gt;
+
+&lt;p&gt;검색해서 나온 여러 결과 중 &lt;a href=&quot;https://github.com/inahjeon/AWS-LAMBDA-LAYER-Selenium&quot;&gt;https://github.com/inahjeon/AWS-LAMBDA-LAYER-Selenium&lt;/a&gt; 에 올려진 파일을 사용했다.&lt;/p&gt;
+
+&lt;p&gt;SELENIUM_LAYER.zip 을 받아서 Layer 에 등록하자.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Layers&lt;/code&gt; -&amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;create layer&lt;/code&gt; 에서 zip 파일만 업로드 해주면 등록되고, lambda function 에서 &lt;code class=&quot;highlighter-rouge&quot;&gt;add a layer&lt;/code&gt; 로 등록한 layer 를 선택해서 추가해주면 된다.&lt;/p&gt;
+
+&lt;p&gt;크롤링 코드는 실행 시간이 좀 필요하기 때문에 timeout 설정을 1분 이상 지정해주자.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753701-a561e180-9e02-11ea-986a-364089afd962.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;import 가 잘된다! 오늘 하는 것 중 가장 난이도 어려운 부분이 쉽게 해결되었다! (덩실덩실)&lt;/p&gt;
+
+&lt;h3 id=&quot;2-cloud-watch-event-trigger-설정하기&quot;&gt;2) Cloud Watch Event Trigger 설정하기&lt;/h3&gt;
+
+&lt;p&gt;이벤트 트리거는 &lt;code class=&quot;highlighter-rouge&quot;&gt;add trigger&lt;/code&gt; 로 들어가서 CloudWatch Events/EventBridge 를 선택하고 아래와 같이 만들 수 있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753850-08a04380-9e04-11ea-9833-1058942a303e.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;매일 새벽 1시에 실행되도록 했다.&lt;/p&gt;
+
+&lt;h3 id=&quot;3-s3에-결과-저장하기&quot;&gt;3) s3에 결과 저장하기&lt;/h3&gt;
+
+&lt;p&gt;이제 s3에 크롤링한 결과를 저장해보자.&lt;/p&gt;
+
+&lt;p&gt;일단 lambda function 에 연결된 권한에 s3 접근 권한도 추가해주어야 한다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82753970-e4913200-9e04-11ea-9d6e-97581eb1afdf.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;IAM -&amp;gt; 역할 에서 연결된 역할을 선택하고 정책연결을 눌러 &lt;code class=&quot;highlighter-rouge&quot;&gt;AmazonS3FullAccess&lt;/code&gt; 권한을 추가 해준다. (세밀한 권한 설정은 잘 모르므로 패스)&lt;/p&gt;
+
+&lt;p&gt;스크립트에서 웹페이지를 s3에 저장하는 코드를 테스트해보자.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;lambda_handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://www.google.com/'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;page_data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;page_source&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;encoded_string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;page_data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;file_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;test.txt&quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;test/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file_name&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;s3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;s3&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bucket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BUCKET_NAME&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s3_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Body&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encoded_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;page_data&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82754141-f9ba9080-9e05-11ea-9f71-9b5c765f59d6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;크롤링한 데이터가 잘 저장된다.&lt;/p&gt;
+
+&lt;p&gt;이제 필요한 기능들은 다 테스트했고, &lt;a href=&quot;https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html#(3)-%ED%81%AC%EB%A1%A4%EB%A7%81-%EC%BD%94%EB%93%9C-%EC%9E%91%EC%84%B1&quot;&gt;이전에 작성해 둔 크롤링 코드&lt;/a&gt;만 적절히 변경해서 넣어주면 된다.&lt;/p&gt;
+
+&lt;h2 id=&quot;2-뉴스-크롤링-하기&quot;&gt;2. 뉴스 크롤링 하기&lt;/h2&gt;
+
+&lt;p&gt;이전 글에서 작성해 두었던 코드를 조금 변경하여 매일매일 그날의 인기뉴스 리스트를 가져와서 s3에 저장하는 코드로 변경했다.&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;datetime&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timezone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timedelta&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;boto3&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;selenium.webdriver.chrome.options&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Options&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;selenium&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webdriver&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;BUCKET_NAME&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getenv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'BUCKET_NAME'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--headless'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--no-sandbox'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--disable-gpu'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--window-size=1280x1696'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--user-data-dir=/tmp/user-data'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--hide-scrollbars'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--enable-logging'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--log-level=0'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--v=99'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--single-process'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--data-path=/tmp/data-path'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--ignore-certificate-errors'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--homedir=/tmp'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'--disk-cache-dir=/tmp/cache-dir'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;add_argument&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;binary_location&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/opt/python/bin/headless-chromium&quot;&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webdriver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Chrome&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'/opt/python/bin/chromedriver'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;chrome_options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;
+	
+&lt;span class=&quot;n&quot;&gt;_SECTIONS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'100'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'정치'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'101'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'경제'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'102'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'사회'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'103'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'생활/문화'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'104'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'세계'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'105'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'IT/과학'&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;write_to_s3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;news_type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;encoded_string&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'utf-8'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;file_name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'{date_str}.txt'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3_path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'{news_type}/'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;file_name&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;s3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;boto3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resource&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'s3'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;s3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bucket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BUCKET_NAME&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put_object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s3_path&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Body&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encoded_string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_popular_day_news_contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;section_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'https://news.naver.com/main/ranking/popularDay.nhn'&lt;/span&gt; \
+        &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'?rankingType=popular_day'&lt;/span&gt; \
+        &lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&amp;amp;sectionId={section_id}&amp;amp;date={date_str}'&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;implicitly_wait&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_elements_by_class_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ranking'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;headlines&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_elements_by_class_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ranking_headline'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ledes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_elements_by_class_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ranking_lede'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;offices&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_elements_by_class_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ranking_office'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;views&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ranking&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_elements_by_class_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ranking_view'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;zip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;headlines&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ledes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;offices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;views&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;lambda_handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;event&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;tz&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timezone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;timedelta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hours&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;kst_dt&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datetime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;astimezone&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tz&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;kst_dt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strftime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Y&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;d'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'date'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'section'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'office'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'view'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'headline'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'lede'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'link'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;columns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;section_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;section_name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_SECTIONS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_popular_day_news_contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;section_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headline&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lede&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;office&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;headline_a_tag&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headline&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;find_element_by_tag_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'a'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\t&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;section_name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;office&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;view&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;headline_a_tag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_attribute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'title'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;lede&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;headline_a_tag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_attribute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'href'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;write_to_s3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'popular_day'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+    
+    &lt;span class=&quot;n&quot;&gt;driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;3-결과물-확인&quot;&gt;3. 결과물 확인&lt;/h2&gt;
+
+&lt;p&gt;Test로 Cloud Watch Event trigger 에서 임시로 1분 뒤인 오후 9시 40분으로 스케쥴링해서 기다려본다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82754441-e3153900-9e07-11ea-8754-fe213b3350f2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;오후 9시 42분에 job이 종료되었고 s3에 데이터를 잘 저장한 걸 확인할 수 있었다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/82754442-e7415680-9e07-11ea-8ec7-886b7c799d38.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;걸린시간은 &lt;code class=&quot;highlighter-rouge&quot;&gt;89400ms&lt;/code&gt;, 메모리는 &lt;code class=&quot;highlighter-rouge&quot;&gt;340MB&lt;/code&gt; 정도 사용한다고 한다.&lt;/p&gt;
+
+&lt;p&gt;Lambda 요금을 보면 메모리 512MB에 100ms 당 0.0000008333 USD 라고 하니, 1년 365일 돌리면 $28 달러 정도다.&lt;/p&gt;
+
+&lt;p&gt;결과물이 매우 만족스럽다. 자동화 칭찬해. 👏👏👏&lt;/p&gt;</content><author><name></name></author><summary type="html">데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.</summary></entry><entry><title type="html">내맘대로 뉴스 요약 큐레이션 (1) - 시작 그리고 뉴스 크롤링</title><link href="https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html" rel="alternate" type="text/html" title="내맘대로 뉴스 요약 큐레이션 (1) - 시작 그리고 뉴스 크롤링" /><published>2020-04-26T00:00:00-05:00</published><updated>2020-04-26T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1</id><content type="html" xml:base="https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html">&lt;!--
 #################################################
 ### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
 #################################################
@@ -3230,279 +3447,4 @@ Recall: 실제 True 중에서 True를 올바르게 예측한 비율&lt;/p&gt;
   &lt;li&gt;대용량 분산처리가 어려운 사전 NLP 작업의 경우(라이브러리 설치 등) API화 하여 호출하여 사용&lt;/li&gt;
   &lt;li&gt;모델 서빙 시 inference 서버 외 전/후 처리(비즈니스 로직 등)를 담당하는 서버 따로 사용&lt;/li&gt;
   &lt;li&gt;Labeling 오류 수정 자동화 &amp;gt; PICO 알고리즘 테스트 해보기&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">Deview2019 참석 후 작성한 세션 요약글 입니다.</summary></entry><entry><title type="html">Devfest2019</title><link href="https://inahjeon.github.io/devlog/conference/2019/10/20/devfest2019.html" rel="alternate" type="text/html" title="Devfest2019" /><published>2019-10-20T11:46:00-05:00</published><updated>2019-10-20T11:46:00-05:00</updated><id>https://inahjeon.github.io/devlog/conference/2019/10/20/devfest2019</id><content type="html" xml:base="https://inahjeon.github.io/devlog/conference/2019/10/20/devfest2019.html">&lt;h1 id=&quot;쉽게-따라할-수-있는-한국어-임베딩-구축---이기창&quot;&gt;쉽게 따라할 수 있는 한국어 임베딩 구축 - 이기창&lt;/h1&gt;
-
-&lt;h2 id=&quot;단어-임베딩으로-문서-분류하기&quot;&gt;단어 임베딩으로 문서 분류하기&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;가장 많이 사용: fastText&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;핵심-컨셉&quot;&gt;핵심 컨셉&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;문서에 속한 단어가 유사하면 문서 의미도 비슷하다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;문서-벡터를-어떻게-만드나&quot;&gt;문서 벡터를 어떻게 만드나?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;단어 임베딩의 합(sum)으로 문서 백터를 표현한다. (단어 벡터의 합 = 단어 벡터의 평균 = 문서 벡터의 중심)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;실험으로-검증&quot;&gt;실험으로 검증&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;네이버 영화 리뷰 말뭉치 활용&lt;/li&gt;
-  &lt;li&gt;학습데이터(문장, label) 댓글을 모두 문서 벡터(단어 임베딩의 합)로 변환한다.&lt;/li&gt;
-  &lt;li&gt;cosine similarity 가 가장 높은 학습 데이터의 label로 분류&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;시사점&quot;&gt;시사점&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;복잡한 딥러닝 모델을 써도 80%대 성능 기록&lt;/li&gt;
-  &lt;li&gt;단어 임베딩 품질이 좋으면 자연어처리 성능을 높일 수 있음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;임베딩이-어떻게-의미를-가지는가&quot;&gt;임베딩이 어떻게 의미를 가지는가&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;말뭉치의 통계적 패턴이 들어있음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;back-of-words&quot;&gt;Back-of-Words&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;단어 빈도를 센다.&lt;/li&gt;
-  &lt;li&gt;문서를 쓴이의 의도는 단어 사용 패턴에 드러난다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;elmo-bert&quot;&gt;ELMo, Bert&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;단어가 어떤 순서로 나타나는지 살핀다. (bi-direction)&lt;/li&gt;
-  &lt;li&gt;시퀀스 정보에 ㅡ이미가 녹아있다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;word2vec-fasttext-glove&quot;&gt;Word2Vec, FastText, GloVe&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;단어가 어떤 단어와 주로 같이 나타나는지 살핀다.&lt;/li&gt;
-  &lt;li&gt;문맥에 의미가 녹아있다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;문장-수준-임베딩-구축-및-활용-요즘-대세-elmo-bert&quot;&gt;문장 수준 임베딩 구축 및 활용 (요즘 대세): ELMo, BERT&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;2014년은 워드 임베딩, 그 이후로 elmo (sentence embedding) 쪽으로 많이 연구되고 있음.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;ELMo: bidirectional LSTM, + CNN (다음 단어를 예측)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;BERT: (SOTA) Transformer network (Attention is all you need)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;문장-수준-임베딩&quot;&gt;문장 수준 임베딩&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;문장 수준 임베딩의 장점은 동음이의어 분간 가능&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;문장의 문맥적 의미를 벡터화할 수 있음.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;토큰화 &amp;gt; vocabulary &amp;gt; 학습&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;bert&quot;&gt;BERT&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;https://github.com/yeontaek/BERT-Korean-Model&lt;/li&gt;
-  &lt;li&gt;SKT: https://github.com/SKTBrain/KoBERT&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;임베딩-활용&quot;&gt;임베딩 활용&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;임베딩이 가장 크게 쓰일 수있는 분야는 전이학습.&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;다른 네트워크의 입력값으로 사용돼 자연어 처리 성능을 높일 수 있음&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Bengio &amp;gt; Data Augmentation &amp;gt; Mixup&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;clean-code-for-mlai---한성민&quot;&gt;Clean Code for ML/AI - 한성민&lt;/h1&gt;
-
-&lt;h2 id=&quot;what-is-clean-code&quot;&gt;What is Clean Code&lt;/h2&gt;
-
-&lt;p&gt;깨진 유리창 이론 ~ 코드 품질&lt;/p&gt;
-
-&lt;p&gt;보이 스카웃 규칙 - 떠날 때는 찾을 때 보다 캠프장을 더욱 께끗이 할 것.&lt;/p&gt;
-
-&lt;h2 id=&quot;usecase&quot;&gt;Usecase&lt;/h2&gt;
-
-&lt;p&gt;코드 악취 - 코드에 문제가 발생할 때 생기는 나쁜냄새&lt;/p&gt;
-
-&lt;h3 id=&quot;코드-악취-유형-1&quot;&gt;코드 악취 유형 1&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;branch는 코드 복잡도를 높이므로 너무 많이 사용하지 않는 것 이 좋음.&lt;/li&gt;
-  &lt;li&gt;guard clause 패턴으로 코드를 아예 실행시키지 않도록 함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;코드-악취2---주석을-남용&quot;&gt;코드 악취2 - 주석을 남용&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;자세하고 친절한 주석을 함수 이름으로 바꿔보세요.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;코드-악취-3---중복코드&quot;&gt;코드 악취 3 - 중복코드&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;중복되는 코드 합치기&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;그밖의-코드-악취-케이스&quot;&gt;그밖의 코드 악취 케이스&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;너무 긴 메소드&lt;/li&gt;
-  &lt;li&gt;너무 거대한 클래스&lt;/li&gt;
-  &lt;li&gt;상속 거부: 자식 클래스에서 부모 클래스의 규칙을 무시하고 오버라이드&lt;/li&gt;
-  &lt;li&gt;과도한 복잡성&lt;/li&gt;
-  &lt;li&gt;게으른 클래스: 클래스에 부여된 기능이 너무 적은 경우&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;실제-모델-코드-최적화-attention-based-bidirectional-lstm&quot;&gt;실제 모델 코드 최적화: Attention-based bidirectional LSTM&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;안쓰는 키워드 제거&lt;/li&gt;
-  &lt;li&gt;직접 기입되어 있는 설정 인수들을 전역 변수로 추출 (수정이 빈번하게 일어남)&lt;/li&gt;
-  &lt;li&gt;복잡성이 높은 로직은 함수로 추출&lt;/li&gt;
-  &lt;li&gt;조건식 단순화, 중복 코드 함수 추출 (모델 코드의 경우 조건을 사용하는 경우가 많음)&lt;/li&gt;
-  &lt;li&gt;모델 혹은 옵티마이저의 인수정보들을 전역 변수에서 설정 프레임워크를 이용한 파라미터로 전환 (google/gin-config)&lt;/li&gt;
-  &lt;li&gt;코드 컨벤션 공통화
-    &lt;ul&gt;
-      &lt;li&gt;single, double quotation&lt;/li&gt;
-      &lt;li&gt;함수 사이 2줄&lt;/li&gt;
-      &lt;li&gt;1줄을 넘어서는 함수 인수의 intent&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;configuration-관리툴&quot;&gt;configuration 관리툴&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;https://github.com/IDSIA/sacred&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;lint-quality-gate&quot;&gt;Lint, Quality gate&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;python lint 도구: pylint, flake8, pycodestyle&lt;/li&gt;
-  &lt;li&gt;Quality gate 도구: code grade를 알려줌. (sonarqube, codeclimate, codebeat)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;the-anti-patterns&quot;&gt;The anti-patterns&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;if/switch 절의 남용 -&amp;gt; key access를 통한 분기대체&lt;/li&gt;
-  &lt;li&gt;데이터 초기화와 데이터 삽입 로직의 분리: 고차함수를 이용한 대체
-    &lt;blockquote&gt;
-      &lt;p&gt;ex) 빈 배열 &amp;gt; append로 배열 채움.&lt;/p&gt;
-    &lt;/blockquote&gt;
-  &lt;/li&gt;
-  &lt;li&gt;타입(type)의 부재&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;qa&quot;&gt;Q&amp;amp;A&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;모델 테스트: 기존 테스트의 결과와 유사도로 검증 (일정 유사도 이하면 error)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;bert-in-kaggle---이유한-이영수-송원호&quot;&gt;BERT in kaggle - 이유한, 이영수, 송원호&lt;/h1&gt;
-
-&lt;h2 id=&quot;transformer&quot;&gt;Transformer&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Encoder - Decoder 구조임 (seq-to-seq NMT에서 많이 사용)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;encoder&quot;&gt;Encoder&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;self-attension, feed forword network가 있음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;self-attension&quot;&gt;self-attension&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;sealed dot product
--&amp;gt; (Q,K 내적)유사도를 구해서 scalaing&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;bert-1&quot;&gt;BERT&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Pretraining (masked LM, Next sentence prediction)&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Fine-tuning&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Transformer의 Encoder만 사용함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;image-domain과-비교&quot;&gt;image domain과 비교&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;CNN -&amp;gt; self-attention&lt;/li&gt;
-  &lt;li&gt;Residual Block -&amp;gt; Encoder Block&lt;/li&gt;
-  &lt;li&gt;RESNET -&amp;gt; transformer&lt;/li&gt;
-  &lt;li&gt;RESNET(pretrained) -&amp;gt; BERT (pretrained)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;toxic-jigsaw-unintended-bias-in-tocity-classification&quot;&gt;Toxic Jigsaw unintended bias in tocity classification&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;정상 코멘트(문장, 문단, 단어,..)인지 악성 코멘트인지 분류하는 문제&lt;/li&gt;
-  &lt;li&gt;특정 키워드가 포함되면 악성으로 구분할 확률이 상당히 높아짐. (정상인데 악성으로 분류되는 경우)&lt;/li&gt;
-  &lt;li&gt;대회에서 키워드들을 제시함.&lt;/li&gt;
-  &lt;li&gt;Metric: AUC, bias-AUC (특정 키워드가 포함되었지만 정상 코멘트를 잘 찾아내는 척도)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;진행방법&quot;&gt;진행방법&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Baseline: Fasttext -&amp;gt; RNN&lt;/li&gt;
-  &lt;li&gt;evaluation EDA를 진행&lt;/li&gt;
-  &lt;li&gt;커스텀 loss function을 정의함.&lt;/li&gt;
-  &lt;li&gt;문맥에 따라 임베딩을 다르게 함. -&amp;gt; BERT를 활용&lt;/li&gt;
-  &lt;li&gt;Ensemble 사용&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;좋은 머신은 꼭 필요하다.&lt;/li&gt;
-  &lt;li&gt;작은 모델 뿐 아니라 큰 모델 역실 중요하다&lt;/li&gt;
-  &lt;li&gt;Evaluation에 맞는 loss를 잘 정의해야한다.&lt;/li&gt;
-  &lt;li&gt;일찍 파이프라인을 구성하고 많은 실험을 시도한다.&lt;/li&gt;
-  &lt;li&gt;제한된 시간 하에 높ㅇ느 점수를 내야해서 속도를 줄이기 위한 여러 기술이 필요하다.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;molucle&quot;&gt;Molucle&lt;/h2&gt;
-
-&lt;h3 id=&quot;분자-학습을-어떻게-시킬까&quot;&gt;분자 학습을 어떻게 시킬까?&lt;/h3&gt;
-
-&lt;h4 id=&quot;왜-다양한-딥러닝-아키텍쳐가-필요할까&quot;&gt;왜 다양한 딥러닝 아키텍쳐가 필요할까?&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;일반 머신러닝은 데이터를 표현하는데 한계가 있음 (LeCun)&lt;/li&gt;
-  &lt;li&gt;주어진 데이터 내에서 피쳐를 잘 추출해내기 위함&lt;/li&gt;
-  &lt;li&gt;데이터가 가진 정보는 다양한 형태, 관계, 성질을 가지기 때문&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;분자---그래프로-표현&quot;&gt;분자 -&amp;gt; 그래프로 표현&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;문장으로 표현해본다면?&lt;/li&gt;
-  &lt;li&gt;분자가 가진 여러 정보들을 문장으로 표현 (e.g. 탄소 4개가 있음 등)&lt;/li&gt;
-  &lt;li&gt;각각의 정보들을 임베딩해 vector로 만듦.&lt;/li&gt;
-  &lt;li&gt;vector를 이어붙여 float sentence 생성&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;캐글에서-높은-점수를-얻으려면&quot;&gt;캐글에서 높은 점수를 얻으려면?&lt;/h3&gt;
-
-&lt;h4 id=&quot;1-with-diversity-do-ensemble&quot;&gt;(1) with diversity, do ensemble!&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;difreret model -&amp;gt; different layer, different hidden dim&lt;/li&gt;
-  &lt;li&gt;different seed -&amp;gt; different training subset&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;2-pseudo-labeling&quot;&gt;(2) Pseudo labeling&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;우리가 예측한 값을 target으로 한 test set으로 새로 학습하는것&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;3-함께-하라&quot;&gt;(3) 함께 하라!&lt;/h4&gt;
-
-&lt;h3 id=&quot;모델의-성능을-높이기-위해-생각해야할-것&quot;&gt;모델의 성능을 높이기 위해 생각해야할 것!&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;데이터의 핵심 피쳐를 잘 표한할 수 있는 학습 방식을 선택하라. (CNN, RNN, GNN, Transformer, Embedding)&lt;/li&gt;
-  &lt;li&gt;데이터를 잘 학습할 수 있는 Loss function을 찾아라 (다 해봐야할).&lt;/li&gt;
-  &lt;li&gt;학습이 잘 될 수 있는 조건을 최적화시켜라 (학습 스케쥴, 구조 최적화 등)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">쉽게 따라할 수 있는 한국어 임베딩 구축 - 이기창</summary></entry></feed>
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Deview2019 참석 후 작성한 세션 요약글 입니다.</summary></entry></feed>

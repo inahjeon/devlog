@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기 | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다." />
+<meta property="og:description" content="데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.","headline":"내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기","dateModified":"2020-05-24T00:00:00-05:00","datePublished":"2020-05-24T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html"},"url":"https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/devlog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+<link rel="shortcut icon" type="image/x-icon" href="/devlog/images/favicon.ico"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기 | inahjeon’s devlog</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다." />
+<meta property="og:description" content="데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다." />
+<link rel="canonical" href="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" />
+<meta property="og:url" content="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" />
+<meta property="og:site_name" content="inahjeon’s devlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-05-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.","headline":"내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기","dateModified":"2020-05-24T00:00:00-05:00","datePublished":"2020-05-24T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html"},"url":"https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+<link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css"><link type="application/atom+xml" rel="alternate" href="https://inahjeon.github.io/devlog/feed.xml" title="inahjeon's devlog" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-127410069-1','auto');ga('require','displayfeatures');ga('send','pageview');</script>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head><body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/devlog/">inahjeon&#39;s devlog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/devlog/about/">About</a><a class="page-link" href="/devlog/archive/">Archive</a><a class="page-link" href="/devlog/categories/">Categories</a><a class="page-link" href="/devlog/search/">Search</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-05-24T00:00:00-05:00" itemprop="datePublished">
+        May 24, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      4 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/devlog/categories/#side project">side project</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.</p>
+
+<h2 id="0-어떻게-만들어-볼까">0. 어떻게 만들어 볼까?</h2>
+
+<p>개인 aws 계정을 사용할 예정이기 때문에, 다른건 다 필요없고 가장 저렴하게 자동화된 데이터 수집 파이프라인을 만들고 싶었다.</p>
+
+<p>찾아보니 AWS Cloud watch Event Trigger -&gt; Lambda function -&gt; S3에 저장 으로 하는것이 가장 경제적이라 카더라는 얘기가 많아서 이렇게 만들어보기로 했다.</p>
+
+<h2 id="1-aws-lambda-function-만들기">1. AWS Lambda Function 만들기</h2>
+
+<p>Lambda 함수를 만들러 가보자.</p>
+
+<p>Lambda 서비스에서 함수 생성 기능을 누르면 아래와 같이 만들려는 함수 이름, 런타임, 권한에 대해서 지정할 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753054-ae03e900-9dfd-11ea-8fca-fdb93b8d1fa6.png" alt="" /></p>
+
+<p>런타임은 나중에 필요한 selenium + chromium 때문에 python 3.6 버전으로 설정했다.</p>
+
+<p>함수생성을 하면 아래와 같은 화면을 볼 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753076-db509700-9dfd-11ea-9416-d33eb300dad6.png" alt="" /></p>
+
+<p>트리거 추가에서 lambda function 을 실행할 때 필요한 trigger 를 추가할 수 있고, 함수 코드 영역에 실행할 코드를 직접 작성하거나, 압축된 실행 파일을 업로드할 수 있다.</p>
+
+<h3 id="1-layers-에-selenium--chromium-패키지-찾아서-올리기">1) Layers 에 Selenium + Chromium 패키지 찾아서 올리기</h3>
+
+<p>예전에는 lambda 코드에서 python 기본 라이브러리 외 다른 라이브러리를 사용하는 경우, 스크립트 코드와 스크립트에 필요한 파이썬 패키지파일들을 모두 한데모아…. zip으로 압축해서 올려주어야 했다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753283-74cc7880-9dff-11ea-8244-5664537a9304.png" alt="" />
+(lambda_function.zip…)</p>
+
+<p>그런데 최근에는 <code class="highlighter-rouge">Layers</code> 라는 기능이 추가되어서 필요한 패키지 파일을 따로 Layer에 넣어둘 수 있고, 스크립트 코드에서 Layer 에 있는 패키지를 import 할 수 있도록 분리되었다. (<del>오예!</del>)</p>
+
+<p>사실 예전에 lambda 함수를 써보려고 할 때 테스트 환경이 불편해서 잘 쓰지 못했었다. 특히 외부 라이브러리를 쓰는 경우나, lambda 실행 환경에서 크롤링에 필요한 headless chrome driver를 테스트 해보는 경우 더더욱 시간이 많이 들고 어려웠다.
+그런데 Layers 기능이 생기면서 Layer에 필요한 패키지를 올려두고 스크립트 코드만 작성할 수 있게 되어서 빠른 테스트도 가능해졌다.</p>
+
+<p>찾아보니 로컬에서 테스트할 때는 AWS lambda 의 실행환경에 맞춘 <a href="https://github.com/lambci">lambci</a> 에서 제공하는 docker 이미지 파일로 테스트 해볼 순 있다고 한다. 하지만 그냥 바로 editor 에서 테스트하는게 제일 편하다.</p>
+
+<p>그러면 나에게 필요한 건 크롤링 코드를 돌리기 위한 selenium + chrome driver Layer 가 필요하다.</p>
+
+<p>lambda 를 이용해서 selenium 으로 크롤링하는 건 이전에 매우 많은 훌륭하신 분들이 많은 삽질을 해 두었을 것이므로, 열심히 구글링해보니 바로 구할 수 있었다.</p>
+
+<p>검색해서 나온 여러 결과 중 <a href="https://github.com/inahjeon/AWS-LAMBDA-LAYER-Selenium">https://github.com/inahjeon/AWS-LAMBDA-LAYER-Selenium</a> 에 올려진 파일을 사용했다.</p>
+
+<p>SELENIUM_LAYER.zip 을 받아서 Layer 에 등록하자.</p>
+
+<p><code class="highlighter-rouge">Layers</code> -&gt; <code class="highlighter-rouge">create layer</code> 에서 zip 파일만 업로드 해주면 등록되고, lambda function 에서 <code class="highlighter-rouge">add a layer</code> 로 등록한 layer 를 선택해서 추가해주면 된다.</p>
+
+<p>크롤링 코드는 실행 시간이 좀 필요하기 때문에 timeout 설정을 1분 이상 지정해주자.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753701-a561e180-9e02-11ea-986a-364089afd962.png" alt="" /></p>
+
+<p>import 가 잘된다! 오늘 하는 것 중 가장 난이도 어려운 부분이 쉽게 해결되었다! (덩실덩실)</p>
+
+<h3 id="2-cloud-watch-event-trigger-설정하기">2) Cloud Watch Event Trigger 설정하기</h3>
+
+<p>이벤트 트리거는 <code class="highlighter-rouge">add trigger</code> 로 들어가서 CloudWatch Events/EventBridge 를 선택하고 아래와 같이 만들 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753850-08a04380-9e04-11ea-9833-1058942a303e.png" alt="" /></p>
+
+<p>매일 새벽 1시에 실행되도록 했다.</p>
+
+<h3 id="3-s3에-결과-저장하기">3) s3에 결과 저장하기</h3>
+
+<p>이제 s3에 크롤링한 결과를 저장해보자.</p>
+
+<p>일단 lambda function 에 연결된 권한에 s3 접근 권한도 추가해주어야 한다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82753970-e4913200-9e04-11ea-9d6e-97581eb1afdf.png" alt="" /></p>
+
+<p>IAM -&gt; 역할 에서 연결된 역할을 선택하고 정책연결을 눌러 <code class="highlighter-rouge">AmazonS3FullAccess</code> 권한을 추가 해준다. (세밀한 권한 설정은 잘 모르므로 패스)</p>
+
+<p>스크립트에서 웹페이지를 s3에 저장하는 코드를 테스트해보자.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">()</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">'https://www.google.com/'</span><span class="p">)</span>
+    <span class="n">page_data</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">page_source</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="n">encoded_string</span> <span class="o">=</span> <span class="n">page_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">"utf-8"</span><span class="p">)</span>
+
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">f</span><span class="s">"test.txt"</span>
+    <span class="n">s3_path</span> <span class="o">=</span> <span class="n">f</span><span class="s">"test/"</span> <span class="o">+</span> <span class="n">file_name</span>
+
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s">"s3"</span><span class="p">)</span>
+    <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">BUCKET_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="n">s3_path</span><span class="p">,</span> <span class="n">Body</span><span class="o">=</span><span class="n">encoded_string</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">page_data</span>
+</code></pre></div></div>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82754141-f9ba9080-9e05-11ea-9f71-9b5c765f59d6.png" alt="" /></p>
+
+<p>크롤링한 데이터가 잘 저장된다.</p>
+
+<p>이제 필요한 기능들은 다 테스트했고, <a href="https://inahjeon.github.io/devlog/side%20project/2020/04/26/news1.html#(3)-%ED%81%AC%EB%A1%A4%EB%A7%81-%EC%BD%94%EB%93%9C-%EC%9E%91%EC%84%B1">이전에 작성해 둔 크롤링 코드</a>만 적절히 변경해서 넣어주면 된다.</p>
+
+<h2 id="2-뉴스-크롤링-하기">2. 뉴스 크롤링 하기</h2>
+
+<p>이전 글에서 작성해 두었던 코드를 조금 변경하여 매일매일 그날의 인기뉴스 리스트를 가져와서 s3에 저장하는 코드로 변경했다.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="kn">import</span> <span class="nn">boto3</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.options</span> <span class="kn">import</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+
+
+<span class="n">BUCKET_NAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">'BUCKET_NAME'</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_driver</span><span class="p">():</span>
+    <span class="n">chrome_options</span> <span class="o">=</span> <span class="n">Options</span><span class="p">()</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--headless'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--no-sandbox'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--disable-gpu'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--window-size=1280x1696'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--user-data-dir=/tmp/user-data'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--hide-scrollbars'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--enable-logging'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--log-level=0'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--v=99'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--single-process'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--data-path=/tmp/data-path'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--ignore-certificate-errors'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--homedir=/tmp'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'--disk-cache-dir=/tmp/cache-dir'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'</span><span class="p">)</span>
+    <span class="n">chrome_options</span><span class="o">.</span><span class="n">binary_location</span> <span class="o">=</span> <span class="s">"/opt/python/bin/headless-chromium"</span>
+
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="s">'/opt/python/bin/chromedriver'</span><span class="p">,</span> <span class="n">chrome_options</span><span class="o">=</span><span class="n">chrome_options</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">driver</span>
+	
+<span class="n">_SECTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'100'</span><span class="p">:</span> <span class="s">'정치'</span><span class="p">,</span>
+    <span class="s">'101'</span><span class="p">:</span> <span class="s">'경제'</span><span class="p">,</span>
+    <span class="s">'102'</span><span class="p">:</span> <span class="s">'사회'</span><span class="p">,</span>
+    <span class="s">'103'</span><span class="p">:</span> <span class="s">'생활/문화'</span><span class="p">,</span>
+    <span class="s">'104'</span><span class="p">:</span> <span class="s">'세계'</span><span class="p">,</span>
+    <span class="s">'105'</span><span class="p">:</span> <span class="s">'IT/과학'</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">write_to_s3</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">news_type</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">encoded_string</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">f</span><span class="s">'{date_str}.txt'</span>
+    <span class="n">s3_path</span> <span class="o">=</span> <span class="n">f</span><span class="s">'{news_type}/'</span> <span class="o">+</span> <span class="n">file_name</span>
+
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">resource</span><span class="p">(</span><span class="s">'s3'</span><span class="p">)</span>
+    <span class="n">s3</span><span class="o">.</span><span class="n">Bucket</span><span class="p">(</span><span class="n">BUCKET_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">put_object</span><span class="p">(</span><span class="n">Key</span><span class="o">=</span><span class="n">s3_path</span><span class="p">,</span> <span class="n">Body</span><span class="o">=</span><span class="n">encoded_string</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_popular_day_news_contents</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">section_id</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">f</span><span class="s">'https://news.naver.com/main/ranking/popularDay.nhn'</span> \
+        <span class="n">f</span><span class="s">'?rankingType=popular_day'</span> \
+        <span class="n">f</span><span class="s">'&amp;sectionId={section_id}&amp;date={date_str}'</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ranking</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'ranking'</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ranking</span><span class="p">:</span>
+        <span class="n">headlines</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'ranking_headline'</span><span class="p">)</span>
+        <span class="n">ledes</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'ranking_lede'</span><span class="p">)</span>
+        <span class="n">offices</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'ranking_office'</span><span class="p">)</span>
+        <span class="n">views</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find_elements_by_class_name</span><span class="p">(</span><span class="s">'ranking_view'</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="n">headlines</span><span class="p">,</span> <span class="n">ledes</span><span class="p">,</span> <span class="n">offices</span><span class="p">,</span> <span class="n">views</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">lambda_handler</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">tz</span> <span class="o">=</span> <span class="n">timezone</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">9</span><span class="p">))</span>
+    <span class="n">kst_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">tz</span><span class="p">)</span>
+    <span class="n">date_str</span> <span class="o">=</span> <span class="n">kst_dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">'</span><span class="si">%</span><span class="s">Y</span><span class="si">%</span><span class="s">m</span><span class="si">%</span><span class="s">d'</span><span class="p">)</span>
+    
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">()</span>
+    
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'date'</span><span class="p">,</span> <span class="s">'section'</span><span class="p">,</span> <span class="s">'office'</span><span class="p">,</span> <span class="s">'view'</span><span class="p">,</span> <span class="s">'headline'</span><span class="p">,</span> <span class="s">'lede'</span><span class="p">,</span> <span class="s">'link'</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">section_id</span><span class="p">,</span> <span class="n">section_name</span> <span class="ow">in</span> <span class="n">_SECTIONS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">get_popular_day_news_contents</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">section_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">contents</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">headline</span><span class="p">,</span> <span class="n">lede</span><span class="p">,</span> <span class="n">office</span><span class="p">,</span> <span class="n">view</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="n">headline_a_tag</span> <span class="o">=</span> <span class="n">headline</span><span class="o">.</span><span class="n">find_element_by_tag_name</span><span class="p">(</span><span class="s">'a'</span><span class="p">)</span>
+                    <span class="n">contents</span> <span class="o">=</span> <span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                        <span class="n">date_str</span><span class="p">,</span>
+                        <span class="n">section_name</span><span class="p">,</span>
+                        <span class="n">office</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                        <span class="n">view</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                        <span class="n">headline_a_tag</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">'title'</span><span class="p">),</span>
+                        <span class="n">lede</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                        <span class="n">headline_a_tag</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s">'href'</span><span class="p">)</span>
+                    <span class="p">])</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contents</span> <span class="o">+</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+    <span class="n">write_to_s3</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s">'popular_day'</span><span class="p">,</span> <span class="s">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    
+    <span class="n">driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="3-결과물-확인">3. 결과물 확인</h2>
+
+<p>Test로 Cloud Watch Event trigger 에서 임시로 1분 뒤인 오후 9시 40분으로 스케쥴링해서 기다려본다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82754441-e3153900-9e07-11ea-8754-fe213b3350f2.png" alt="" /></p>
+
+<p>오후 9시 42분에 job이 종료되었고 s3에 데이터를 잘 저장한 걸 확인할 수 있었다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/16538186/82754442-e7415680-9e07-11ea-8ec7-886b7c799d38.png" alt="" /></p>
+
+<p>걸린시간은 <code class="highlighter-rouge">89400ms</code>, 메모리는 <code class="highlighter-rouge">340MB</code> 정도 사용한다고 한다.</p>
+
+<p>Lambda 요금을 보면 메모리 512MB에 100ms 당 0.0000008333 USD 라고 하니, 1년 365일 돌리면 $28 달러 정도다.</p>
+
+<p>결과물이 매우 만족스럽다. 자동화 칭찬해. 👏👏👏</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="inahjeon/devlog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/devlog/side%20project/2020/05/24/news2.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/devlog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/devlog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/devlog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Inah Jeon&#39;s personal blog</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://www.facebook.com/inahjeon5324" title="inahjeon5324"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#facebook"></use></svg></a></li><li><a rel="me" href="https://github.com/inahjeon" title="inahjeon"><svg class="svg-icon grey"><use xlink:href="/devlog/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
