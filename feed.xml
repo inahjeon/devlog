@@ -1,4 +1,255 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://inahjeon.github.io/devlog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://inahjeon.github.io/devlog/" rel="alternate" type="text/html" /><updated>2020-05-24T08:29:00-05:00</updated><id>https://inahjeon.github.io/devlog/feed.xml</id><title type="html">inahjeon’s devlog</title><subtitle>Inah Jeon's personal blog</subtitle><entry><title type="html">내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기</title><link href="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" rel="alternate" type="text/html" title="내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기" /><published>2020-05-24T00:00:00-05:00</published><updated>2020-05-24T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2</id><content type="html" xml:base="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html">&lt;p&gt;데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="https://inahjeon.github.io/devlog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://inahjeon.github.io/devlog/" rel="alternate" type="text/html" /><updated>2020-10-27T10:18:37-05:00</updated><id>https://inahjeon.github.io/devlog/feed.xml</id><title type="html">inahjeon’s devlog</title><subtitle>Inah Jeon's personal blog</subtitle><entry><title type="html">데이터야 놀자 2020</title><link href="https://inahjeon.github.io/devlog/conference/2020/10/28/datayanolja2020.html" rel="alternate" type="text/html" title="데이터야 놀자 2020" /><published>2020-10-28T00:00:00-05:00</published><updated>2020-10-28T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/conference/2020/10/28/datayanolja2020</id><content type="html" xml:base="https://inahjeon.github.io/devlog/conference/2020/10/28/datayanolja2020.html">&lt;h2 id=&quot;1-line-wallet-추천-시스템-ctr-25배-올린-이야기-김경민&quot;&gt;1. LINE Wallet 추천 시스템 CTR 2.5배 올린 이야기 (김경민)&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;추천 시스템을 실험하며 얻은 인사이트와 내용이 매우 좋았는데, 점심이라 밥먹으며 듣느라 정리를 못했다. 다음에 유튜브에 공개되면 꼭 다시 들어봐야겠다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;2-오픈소스-쉽게-기여하는-방법-강민철&quot;&gt;2. 오픈소스 쉽게 기여하는 방법 (강민철)&lt;/h2&gt;
+
+&lt;h3 id=&quot;1-첫-실패담&quot;&gt;1) 첫 실패담&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;오픈소스에 기여하고 싶었으나, 깃에 대한 개념이 없었음.&lt;/li&gt;
+  &lt;li&gt;코드를 통째로 maintainer 에게 이메일로 코드를 보냄. 응읽씹&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;실패-요인&quot;&gt;실패 요인&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;어디서 부터 시작할지 몰라서&lt;/li&gt;
+  &lt;li&gt;코드기여를 통한 기능향상만을 기여라고 착각해서&lt;/li&gt;
+  &lt;li&gt;내 코드에 대한 논의를 할 줄 몰라서&lt;/li&gt;
+  &lt;li&gt;버전관리를 할 줄 몰라서&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;이후-오픈소스에-다시-관심을-가진-계기&quot;&gt;이후 오픈소스에 다시 관심을 가진 계기:&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;개인 프로젝트의 한계를 느낌 -&amp;gt; 진짜 고수들의 코드를 보고싶은 욕구&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;2-오픈소스-대회에-도전&quot;&gt;2) 오픈소스 대회에 도전&lt;/h3&gt;
+
+&lt;h4 id=&quot;잔꾀부리기---별로-효율이-좋지-않았음&quot;&gt;잔꾀부리기 -&amp;gt; 별로 효율이 좋지 않았음&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;취약점 진단툴을 돌려보고 고친다.&lt;/li&gt;
+  &lt;li&gt;많은 취약점이 있었지만, 기여할 수 있는 취약점은 1개밖에 없었음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;다시-정공법으로-프로젝트의-꼼꼼한-유저-분석적인-유저-가-되어-분석해보자&quot;&gt;다시 정공법으로 프로젝트의 꼼꼼한 유저, 분석적인 유저 가 되어 분석해보자&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;유즈케이스를 만들어서 기여하는 형태로 시작해봄&lt;/li&gt;
+  &lt;li&gt;유저의 입장에서 프로젝트를 사용해보니, 구조도 눈에 잘 보이게됨.&lt;/li&gt;
+  &lt;li&gt;문서를 처음부터 끝가지 꼼꼼하게 사용해봄&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;문서화작업&quot;&gt;문서화작업&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;번역&lt;/li&gt;
+  &lt;li&gt;오타수정&lt;/li&gt;
+  &lt;li&gt;등등&lt;/li&gt;
+  &lt;li&gt;총 119명의 리뷰가 들어갔던 문서화 PR도 있었음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;3-오픈소스-기여-시작할-때-꿀팁들&quot;&gt;3) 오픈소스 기여 시작할 때 꿀팁들&lt;/h3&gt;
+
+&lt;h4 id=&quot;시작은-어떻게-할까&quot;&gt;시작은 어떻게 할까?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;첫 시작하기 좋은 오픈소스? 최근까지 활발한 논의가 이루어지고 있는 레포여야 빠른 피드백을 받을 수 있음&lt;/li&gt;
+  &lt;li&gt;(이슈 풀리퀘 등에 남긴 메인테이너의 최신화 기준)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;무슨-수단으로-기여-git&quot;&gt;무슨 수단으로 기여? git&lt;/h4&gt;
+
+&lt;h4 id=&quot;어떻게-코드-기여를-할-수-있을까&quot;&gt;어떻게 코드 기여를 할 수 있을까?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;코드 기여를 하려면 그 프로젝트를 압도할 실력이 필요할까? 네니요&lt;/li&gt;
+  &lt;li&gt;쉬운 컨트리뷰션은 이슈에 있다. 이슈를 해결할 실력이면 된다.&lt;/li&gt;
+  &lt;li&gt;이슈들 중 뉴비들을 위한 GoodFirstLabel 이 있음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;우린-무엇을-얻을-수-있을까&quot;&gt;우린 무엇을 얻을 수 있을까?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;채용시 우대&lt;/li&gt;
+  &lt;li&gt;뛰어난 개발자분들의 피드백과 협업경험&lt;/li&gt;
+  &lt;li&gt;정갈하고 수준높은 코드를 읽고 쓰는 훈련&lt;/li&gt;
+  &lt;li&gt;꼼꼼한/분석적인 유저로써의 사용 테스터로써의 안목&lt;/li&gt;
+  &lt;li&gt;영어실력&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;느낀점&quot;&gt;느낀점&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;뭔가 나도 이제 오픈 소스 기여를 해볼 수 있을 것만 같아…! 라는 동기부여를 얻을 수 있었음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;3-datacosmetics-화장품을-데이터로-바라보기&quot;&gt;3. DataCosmetics 화장품을 데이터로 바라보기&lt;/h2&gt;
+
+&lt;p&gt;데이터로 맞춤형 화장품을 찾아가는 재미
+인공지능 연구사 맞춤형화장품 조제관리사 자격을 가지고 있음&lt;/p&gt;
+
+&lt;h3 id=&quot;현실-세계의-화장품&quot;&gt;현실 세계의 화장품&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;감각적인 브랜드 이미지와 광고 모델이 생각남. 광고에 나오는 분위기나 이미지를 연상&lt;/li&gt;
+  &lt;li&gt;연간 1만 8천종의 신상 화장품이 출시됨. 너무 가지수가 많아서 나에게 맞는 화장품을 찾기 어려움.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;화장품을 데이터로 설명할 수 있다면 나에게 꼭 맞는 화장품을 찾을 수 있다.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;화장품은 데이터다, 피부는 데이터다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;화장품을-데이터로-바라보기토이프로젝트&quot;&gt;화장품을 데이터로 바라보기(토이프로젝트)&lt;/h3&gt;
+
+&lt;h4 id=&quot;화장품은-무엇으로-정의되는가&quot;&gt;화장품은 무엇으로 정의되는가?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;성분, 카테고리, 제품의 기능이나 효능, 용량대비 가격, 사용감, 발림감 등&lt;/li&gt;
+  &lt;li&gt;그 중 화장품의 전성분 (성분의 전체) 으로 먼저 진행해봄&lt;/li&gt;
+  &lt;li&gt;인터넷에서 스킨케어 화장품을 크롤링하고 살펴봄&lt;/li&gt;
+  &lt;li&gt;브랜드 용량 전성분 제품명 카테고리 가격을 얻을 수 있었음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;1만개의-화장품을-조사하여-데이터로-표현&quot;&gt;1만개의 화장품을 조사하여 데이터로 표현&lt;/h4&gt;
+&lt;p&gt;-&amp;gt; 6천가지 전성분의 조합으로 이루어짐
+-&amp;gt; 6000차원의 one-hot 벡터로 표현&lt;/p&gt;
+
+&lt;h4 id=&quot;스킨케어-데이터로-예측에-활용&quot;&gt;스킨케어 데이터로 예측에 활용&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;스킨토너, 로션, 크림인지 (제품의 제형 예측)&lt;/li&gt;
+  &lt;li&gt;기능이나 효능에 대한 예측&lt;/li&gt;
+  &lt;li&gt;사용감, 발림감 등&lt;/li&gt;
+  &lt;li&gt;제품의 인기나 선호도&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;전성분을-기준으로-정의된-화장품데이터를-이용해서-카테고리르-예측하는-문제로-정의&quot;&gt;전성분을 기준으로 정의된 화장품데이터를 이용해서 카테고리르 예측하는 문제로 정의&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;크림, 로션 -&amp;gt; 0 유분형&lt;/li&gt;
+  &lt;li&gt;스킨 에센스 -&amp;gt; 1 수분형&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;8,000개 학습 2,000개로 예측하여 XGBoost 사용. 정확도 80%로 예측에 성공&lt;/p&gt;
+
+&lt;h3 id=&quot;아트랩의-데이터-코스메틱-기획과-런칭&quot;&gt;아트랩의 데이터 코스메틱 기획과 런칭&lt;/h3&gt;
+
+&lt;h4 id=&quot;궁극의-올인원-솔루션을-만들수-있을까&quot;&gt;궁극의 올인원 솔루션을 만들수 있을까?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;만들수 없다.&lt;/li&gt;
+  &lt;li&gt;사람들마다 원하는 기능이나 사용감이 달랐음&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;서로-다른-고객에세-서로-다른-솔루션을-제공하려면&quot;&gt;서로 다른 고객에세 서로 다른 솔루션을 제공하려면?&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;고객의 현재 피부 상황을 파악할 수 있는 데이터가 필요.&lt;/li&gt;
+  &lt;li&gt;복합성 피부 타입(건성 지성,..), 복합적인 피부 고민(뾰루지 홍조,..) 등&lt;/li&gt;
+  &lt;li&gt;평소 피부에 관심이 없거나 잘못이해하고 있는 고객에게도 정확한 데이터를 알수있게 해야함.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;피부-생활패턴-외부환경-취향을-분석하여-제공해야하는-화장품을-매칭&quot;&gt;피부, 생활패턴, 외부환경, 취향을 분석하여 제공해야하는 화장품을 매칭&lt;/h4&gt;
+&lt;p&gt;-&amp;gt; 데이터코스매틱 매니폴드를 만들게됨.&lt;/p&gt;
+
+&lt;h3 id=&quot;소비자의-화장품-반을-살펴보기&quot;&gt;소비자의 화장품 반을 살펴보기&lt;/h3&gt;
+
+&lt;p&gt;매니폴드 화장품 와디즈에서 베타 테스트 진행중&lt;/p&gt;
+
+&lt;h4 id=&quot;소비자의-인식에-대한-실험을-진행함&quot;&gt;소비자의 인식에 대한 실험을 진행함.&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;감성적인 광고(나를 위한 화장품, 친근하고 따듯한 이미지)와 이성적인 광고(내 피부 데이터, 정확성, 신뢰성)로 A/B테스트를 해보자!&lt;/li&gt;
+  &lt;li&gt;페이스북, 인스타그램에서 감성, 이성 광고 각 5개씩 제작하여 1주일 클릭반응률 실험&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;실험결과-이성적인-광고의-효과가-더-좋았다&quot;&gt;실험결과: 이성적인 광고의 효과가 더 좋았다.&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;소비자들은 이성적인 화장품에 관심이 있다.&lt;/li&gt;
+  &lt;li&gt;소비자들은 데이터코스매틱에 관심이 있다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;느낀점-1&quot;&gt;느낀점&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;제품에 대한 가설, 광고를 할 때도 가설 기반으로 작고 빠르게 실험하고 데이터로 잘 검증해서 학습해나가는 조직이라는 인상을 받았음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;4-대학교-경제학-강의를-힙한-데이터특강으로-피봇팅한-썰&quot;&gt;4. 대학교 경제학 강의를 힙한 데이터특강으로 피봇팅한 썰&lt;/h2&gt;
+&lt;p&gt;스타트업 대표임 - 증권 데이터, 경제데이터에대해 기사를 자동으로 만들어주는 RPA 서비스&lt;/p&gt;
+
+&lt;h3 id=&quot;경제학-전공해서-데이터-강의의-어려움&quot;&gt;경제학 전공해서 데이터 강의의 어려움&lt;/h3&gt;
+&lt;p&gt;경제분야에서 강의하니 학생들이 배경지식이 없어 너무 어려워함.
+시장에 적절한 교재가 없음.&lt;/p&gt;
+
+&lt;h3 id=&quot;어떻게-강의를-구성했나&quot;&gt;어떻게 강의를 구성했나?&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;강의안을 블로그로 만듦.&lt;/li&gt;
+  &lt;li&gt;이해하기 쉽게 짤을 많이 만듬.&lt;/li&gt;
+  &lt;li&gt;코드마다 코드에 대한 설명을 적음.&lt;/li&gt;
+  &lt;li&gt;데이터는 현장감 있도록 실제 데이터를 사용함 (상장기업 현황, 캐글-신용카드 이상감지)&lt;/li&gt;
+  &lt;li&gt;통계 중심의 A.I 모형으로. 경제학에서 딥러닝은 다루기는 어려워 회귀모형, 군집모형등 활용.&lt;/li&gt;
+  &lt;li&gt;학생들이 페이지를 방문하는걸 측정해서 KPI 피드백 페이지를 구성&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;5-크로키닷컴---ux-개선-필살기-커맨드-ab&quot;&gt;5. 크로키닷컴 - UX 개선 필살기 커맨드 AB&lt;/h2&gt;
+&lt;p&gt;지그재그의 ab테스트 프로세스&lt;/p&gt;
+
+&lt;h3 id=&quot;ux팀-기능-개발-프로세스&quot;&gt;UX팀 기능 개발 프로세스&lt;/h3&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;주제선정 - 킥오프/아이데이션 - 디자인 - 개발 - a/b테스트 - 프로덕트 적용&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;명확한 a/b테스트를 하여 개선안의 의미를 파악하는 것이 중요&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;ab테스트-단계&quot;&gt;a/b테스트 단계&lt;/h3&gt;
+
+&lt;h4 id=&quot;시작-전&quot;&gt;시작 전)&lt;/h4&gt;
+&lt;p&gt;1) 성과지표설계: 정확히 어떤 목표를 가지고 성과를 분석할 건지 확실해야함&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;유저의 검색을 늘리고싶다/불편하다 -&amp;gt; UI개선 -&amp;gt; 실제로 검색량이 늘었는가? -&amp;gt; 검색량, 재방문율&lt;/li&gt;
+  &lt;li&gt;중요 성과 지표: 검색량과 유저의 재방문 비율, side effect(이탈률, 다른 화면의 영향)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;2) 테스트설계
+특정 조건 및 규모를 감안하여 유저군을 선정해야함&lt;/p&gt;
+
+&lt;p&gt;지그재그 a/b 테스트 플랫폼이 있음.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;s3, athena 이용&lt;/li&gt;
+  &lt;li&gt;실험을 원하는 세그먼트를 선정할 수 있음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;3) 화면로그설계
+UI에 변경에맞게 성과를 측정할 수 있도록 로그를 설계해야함.&lt;/p&gt;
+
+&lt;h4 id=&quot;시작-후&quot;&gt;시작 후&lt;/h4&gt;
+&lt;p&gt;1) 데이터 모니터링
+테스트 후 진행과정 혹은 사이드 이펙트를 보기위해 데이터 모니터링이 필요함.&lt;/p&gt;
+
+&lt;p&gt;s3-&amp;gt; airflow, spark, emr -&amp;gt; s3 -&amp;gt; redash&lt;/p&gt;
+
+&lt;p&gt;데이터 대시보드를 통해 실험을 모니터링함.&lt;/p&gt;
+
+&lt;p&gt;2) 데이터 분석&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;테스트군과 대조군의 그래프를 단순 평균 차이를 비교함. 평균 등 간단한 분석을 함.&lt;/li&gt;
+  &lt;li&gt;통계적 기법을 통한 비교 - 실제로 통계적으로 높은 수치인지 검증 / 분산분석, t-test&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;3) 결론 도출&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;데이터 분석결과 해당 테스트가 성공 했다면 프러덕트에 도입.&lt;/li&gt;
+  &lt;li&gt;실패해도 얻은 인사이트를 쌓고 이를 바탕으로 다른 시도를 해봄.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;느낀점-2&quot;&gt;느낀점&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;지그재그에서는 이렇게 실험하고 있구나하고 실험설계 부터 결론 까지의 과정을 세세하게 알 수 있었음.&lt;/li&gt;
+  &lt;li&gt;개인적으로 지그재그에서 진행한 여러 실험에 대한 인사이트를 들어보고 싶었는데, 그 부분은 없어서 조금 아쉬웠음.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;소감&quot;&gt;소감:&lt;/h2&gt;
+
+&lt;p&gt;코로나 시국이라 오래만에 듣게된 데이터 컨퍼런스라 좋았다. 온라인으로 진행했을 때 사전에 잘 준비되어서인지 더 진행이 매끄러웠던 것 같고, 나름의 현장감(?)도 있어서 집중해서 잘 볼 수 있었다.&lt;/p&gt;
+
+&lt;p&gt;데이터야놀자 컨퍼런스에 관심있던 회사 동료분들과 슬랙에서 같이 대화하면서 세션을 들었는데, 서로 안듣는 세션을 정리해서 공유해주기도 하고 서로 의견을 주고 받으면서 들어서 좀 더 재미있었던 것 같다.&lt;/p&gt;</content><author><name></name></author><summary type="html">1. LINE Wallet 추천 시스템 CTR 2.5배 올린 이야기 (김경민)</summary></entry><entry><title type="html">내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기</title><link href="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html" rel="alternate" type="text/html" title="내맘대로 뉴스 요약 큐레이션 (2) - AWS Lambda 로 크롤링 자동화하기" /><published>2020-05-24T00:00:00-05:00</published><updated>2020-05-24T00:00:00-05:00</updated><id>https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2</id><content type="html" xml:base="https://inahjeon.github.io/devlog/side%20project/2020/05/24/news2.html">&lt;p&gt;데이터분석 하기 전에 최근일자까지 데이터를 다시 크롤링해와야하는 귀찮음이 있어서 이번주는 로컬에서 손으로 돌리던 크롤링을 자동화하기로 했다.&lt;/p&gt;
 
 &lt;h2 id=&quot;0-어떻게-만들어-볼까&quot;&gt;0. 어떻게 만들어 볼까?&lt;/h2&gt;
 
@@ -2870,581 +3121,4 @@ client 코드를 실행하면 다음과 같은 결과를 얻을 수 있습니다
 Received &lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;: &lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;: 3
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;예제는 크게 어렵지 않았는데, gRPC의 개념에 대해서는 익숙하지 않아 이해하기 좀 어려웠습니다. 그렇지만 예제를 한번 작성해보고 나니, 개념과 장점에 대해서 좀 더 잘 와닿았던 것 같습니다. 다음에는 tensorflow serving 에서 제공하는 gRPC 통신으로 변경 시 성능 변화가 얼마나 있는지 테스트 해보려고 합니다.&lt;/p&gt;</content><author><name></name></author><summary type="html">tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다.</summary></entry><entry><title type="html">Deview 2019</title><link href="https://inahjeon.github.io/devlog/conference/2019/10/28/deview2019.html" rel="alternate" type="text/html" title="Deview 2019" /><published>2019-10-28T13:20:00-05:00</published><updated>2019-10-28T13:20:00-05:00</updated><id>https://inahjeon.github.io/devlog/conference/2019/10/28/deview2019</id><content type="html" xml:base="https://inahjeon.github.io/devlog/conference/2019/10/28/deview2019.html">&lt;p&gt;&lt;a href=&quot;https://deview.kr/2019/schedule&quot;&gt;Deview2019&lt;/a&gt; 참석 후 작성한 세션 요약글 입니다.&lt;/p&gt;
-
-&lt;h1 id=&quot;세션1-외산-클라우드-없이-ai-플랫폼-제공하기-features-training-serving-and-ai-suite---현동석님&quot;&gt;세션1: 외산 클라우드 없이 AI 플랫폼 제공하기: features, training, serving, and AI Suite. - 현동석님&lt;/h1&gt;
-
-&lt;p&gt;모델을 연구하는 사람들이 모델 연구에만 집중할 수 있도록 다양한 ml 서비스들을 제공하기 위한 플랫폼&lt;/p&gt;
-
-&lt;h2 id=&quot;1-자체-ai-플랫폼이-필요한-이유&quot;&gt;1. 자체 AI 플랫폼이 필요한 이유&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;security - 데이터에 대한 보관, 반출 제한 등&lt;/li&gt;
-  &lt;li&gt;cost - 연산량이 적은 경우 클라우드 사용이 유리. 그러나 대용량 데이터 처리를 지속 수행한다면 비용이 큼&lt;/li&gt;
-  &lt;li&gt;demand - 머신러인 수요는 기하급수적으로 증가. 초기 각자 구축하던 부분에서 공통적인 부분을 플랫폼에서 제공&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;2-어떻게-만들어야-할지-생각해보기--ai-suite&quot;&gt;2. 어떻게 만들어야 할지 생각해보기 &amp;gt; AI Suite&lt;/h2&gt;
-
-&lt;p&gt;이미 구축된 플랫폼이 많았음&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;분산저장 플랫폼&lt;/li&gt;
-  &lt;li&gt;분산 처리 플랫폼&lt;/li&gt;
-  &lt;li&gt;피쳐 엔지니어링 플랫폼 &amp;gt; 없음&lt;/li&gt;
-  &lt;li&gt;모델 학습 플랫폼&lt;/li&gt;
-  &lt;li&gt;모델 서빙 플랫폼&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;하면서-알게-된-머신러닝-모델-제품화의-세-단계&quot;&gt;하면서 알게 된 머신러닝 모델 제품화의 세 단계&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;데이터 처리
-    &lt;ul&gt;
-      &lt;li&gt;데이터 수배, 검토, 처리&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;모델 학습
-    &lt;ul&gt;
-      &lt;li&gt;모델 학습, 평가, 튜닝&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;서빙
-    &lt;ul&gt;
-      &lt;li&gt;성능 평가(응답, 처리량)과 용량 산정 후 서비스로 제공&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;실제로-모델을-제품화할-때-필요한-것들&quot;&gt;실제로 모델을 제품화할 때 필요한 것들&lt;/h3&gt;
-
-&lt;p&gt;모델성능을 최적화하는 것보다 인프라를 만들고 처리하는 시간이 오래걸림&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;데이터 처리가 오래 걸립니다.&lt;/li&gt;
-  &lt;li&gt;자동화를 고려해야합니다.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;3-머신러닝-데이터-준비-자동화하기-ai-features&quot;&gt;3. 머신러닝 데이터 준비 자동화하기: AI Features&lt;/h2&gt;
-
-&lt;p&gt;(네이버는 분산 저장 플랫폼에 데이터가 다 저장되어있고 카탈로그를 웹에서 볼 수 있음)&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;DUMP: 데이터를 어딘가로 가져와서 (hive QL)&lt;/li&gt;
-  &lt;li&gt;ANALYZE: 잘못됐거나 biased 데이터는 없나 보고, 간단한 가시화를 통해 데이터에 대한 인사이트를 얻은 후 (&lt;a href=&quot;https://github.com/PAIR-code/facets&quot;&gt;facet&lt;/a&gt;, jupyter)&lt;/li&gt;
-  &lt;li&gt;BATCH: 잘못된 데이터는 버리고, 나머지는 가공해서 피쳐벡터를 만듦 (pyspark)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;데이터-스냅샷-떠놓기--dump&quot;&gt;데이터 스냅샷 떠놓기 &amp;gt; DUMP&lt;/h3&gt;
-
-&lt;h3 id=&quot;데이터-분석하기검증--가공하기&quot;&gt;데이터 분석하기(검증) &amp;amp; 가공하기&lt;/h3&gt;
-
-&lt;h4 id=&quot;problem&quot;&gt;Problem&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;facet은 데이터를 클라이언트에서 처리&lt;/li&gt;
-  &lt;li&gt;10만건 이상의 데이터는 엄청 느려짐&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;solution&quot;&gt;Solution&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;데이터를 가시화는 인사이트를 얻기 위함&lt;/li&gt;
-  &lt;li&gt;모든 데이터를 다 볼 필요는 없고, &lt;strong&gt;샘플링된 데이터로만 보면 됨.&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;tip1&quot;&gt;Tip1&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;jupyter notebook에서 pyspark를 실행하면 cluster mode로 돌지 않음. (client mode임)&lt;/li&gt;
-  &lt;li&gt;노트북에서는 샘플데이터에 대해 수행하고, batch 기능을 통해 클러스터 모드로 수행하도록 지원함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;tip2&quot;&gt;Tip2&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;텍스트데이터는 대부분 NLP가 필요함&lt;/li&gt;
-  &lt;li&gt;NLP는 사전 데이터와 함께 사용함. &amp;gt; 분산 처리에 적합하지 않음. (수행될 노드에 사전이 설치되어 있어야함)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;NLP API + Throttling proxy(nginx) + mapParition(for bulk request) + UDF로 해결&lt;/strong&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;4-머신러닝-모델-학습&quot;&gt;4. 머신러닝 모델 학습&lt;/h2&gt;
-
-&lt;h3 id=&quot;모델-연구-때와는-다른-제품화-때의-관점&quot;&gt;모델 연구 때와는 다른 제품화 때의 관점&lt;/h3&gt;
-
-&lt;h4 id=&quot;연구시&quot;&gt;연구시&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;가능한 자원을 모두 사용하여 빨리 학습하고 평가하는 과정을 반복&lt;/li&gt;
-  &lt;li&gt;최대한 동시에 실행해서 제일 성능 좋은 모델과 파라미터를 얻는 것이 목적&lt;/li&gt;
-  &lt;li&gt;데이터는 고정 되므로 캐싱하면 이득이 있음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;제품화시&quot;&gt;제품화시&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;학습에 걸리는 시간을 이미 알고 있음.&lt;/li&gt;
-  &lt;li&gt;다음 번 갱신 전까지만 학습이 완료되면 됨&lt;/li&gt;
-  &lt;li&gt;일정 시간 내 최소의 자원을 사용하면 좋음&lt;/li&gt;
-  &lt;li&gt;배포 전/후 모델의 품질을 검증할 필요가 있음 (validation 필요 - ex. hamming distance 등)&lt;/li&gt;
-  &lt;li&gt;매번 새로운 데이터로 학습하는 경우가 많아 데이터 개싱 이득이 없음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;학습-자동화&quot;&gt;학습 자동화&lt;/h3&gt;
-
-&lt;p&gt;ML code =&amp;gt; docker image =&amp;gt; resource 입력 후 학습&lt;/p&gt;
-
-&lt;h2 id=&quot;5-머신러닝-모델-서빙하기&quot;&gt;5. 머신러닝 모델 서빙하기&lt;/h2&gt;
-
-&lt;h3 id=&quot;서빙-아키텍처-소개&quot;&gt;서빙 아키텍처 소개&lt;/h3&gt;
-
-&lt;h4 id=&quot;서빙--aps-서빙--모델-서빙&quot;&gt;서빙 = APS 서빙 + 모델 서빙&lt;/h4&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;TFS(TFserving), CFS(Caffe servinf) 등 사용&lt;/li&gt;
-  &lt;li&gt;PyTorch model &amp;gt; onnx converting &amp;gt; .onnx&lt;/li&gt;
-  &lt;li&gt;TF -&amp;gt; SavedModelBuilder &amp;gt; .pb&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;aps-서버-전처리-후처리-전담-서버&quot;&gt;APS 서버: 전처리 후처리 전담 서버&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;APS 서버 에서 전처리 및 후처리 작업을 한 후, serving 서버에 inference 요청을 날림.&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;APS 서버가 inference 서버의 frontend 역할을 함 (비지니스 로직, 메타 데이터 정보를 가짐)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;인퍼런스-서버-띄우기&quot;&gt;인퍼런스 서버 띄우기&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;사용자는 모델과 resource 만 입력&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;데이터-전후-처리-서버-띄우기&quot;&gt;데이터 전후 처리 서버 띄우기&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;git 저장소의 코드 -&amp;gt; CI/CD&lt;/li&gt;
-  &lt;li&gt;json -&amp;gt; gRPC로 매핑해서 날려줌&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;6-모든-단계를-자동화하기&quot;&gt;6. 모든 단계를 자동화하기&lt;/h2&gt;
-
-&lt;h3 id=&quot;각-단계를-api로-만들기&quot;&gt;각 단계를 API로 만들기&lt;/h3&gt;
-
-&lt;h3 id=&quot;드래그-앤-드롭으로-파이프라인-작업-코드-자동-생성하기&quot;&gt;드래그 앤 드롭으로 파이프라인 작업 코드 자동 생성하기&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;MNIST 데모 시연함&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;알아서-자동으로-배포하게-만들기&quot;&gt;알아서 자동으로 배포하게 만들기&lt;/h3&gt;
-
-&lt;h3 id=&quot;최종-데모&quot;&gt;최종 데모&lt;/h3&gt;
-
-&lt;h1 id=&quot;세션2-신호처리-이론으로-실용적인-스타일-변환-모델-만들기-better-faster-stronger-transfer---유재준님&quot;&gt;세션2: 신호처리 이론으로 실용적인 스타일 변환 모델 만들기 (Better Faster Stronger Transfer) - 유재준님&lt;/h1&gt;
-
-&lt;h2 id=&quot;1-스타일-트랜스퍼란&quot;&gt;1. 스타일 트랜스퍼란?&lt;/h2&gt;
-
-&lt;p&gt;이미지에서 스타일은 뭘까? 컨텐츠는 뭘까? 그리고 어떻게 옮기지?&lt;/p&gt;
-
-&lt;h3 id=&quot;artistic-style-transfer-vs-photo-realistic-style-transfer&quot;&gt;Artistic style transfer vs. Photo-realistic style transfer&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Artistic style transfer: 이미지를 예술적으로 변환하는 문제 (ex. Gatys et al. CVPR 16)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Photo-realistic style transfer: 이미지를 사실적으로 변환하는 문제 (ex. 낮에서 저녁으로 등)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;style-transfer-왜-중요한데&quot;&gt;Style transfer 왜 중요한데?&lt;/h3&gt;
-
-&lt;p&gt;Style transfer: Generative model&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Unsupervised Learning&lt;/li&gt;
-  &lt;li&gt;Representation Learning&lt;/li&gt;
-  &lt;li&gt;Feature extraction&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;질감-생성-옛날에는-어떻게-했을까&quot;&gt;질감 생성: 옛날에는 어떻게 했을까?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;어떤 선형 필터들의 조합으로 표현&lt;/li&gt;
-  &lt;li&gt;질감마다 필터 정의가 필요했음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;최초로-cnns을-사용한-연구---neural-style-algorithm&quot;&gt;최초로 CNNs을 사용한 연구 - Neural Style Algorithm&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Gatys et al., NIPS 2015&lt;/li&gt;
-  &lt;li&gt;Gatys et al., CVPR 2016&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;2-스타일-트랜스퍼-왜-되는걸까&quot;&gt;2. 스타일 트랜스퍼, 왜 되는걸까?&lt;/h2&gt;
-
-&lt;h3 id=&quot;how-it-works&quot;&gt;How it works?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Minimizing Maximum Mean Discrepancy (MMD) (Li et al., IJCAI 2017)&lt;/li&gt;
-  &lt;li&gt;두게의 분포 사이의 거리를 최소화하는 것과 같음을 밝혀냄&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;why-vgg만-잘되나&quot;&gt;Why VGG만 잘되나?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;아직 밝혀지지 않음.&lt;/li&gt;
-  &lt;li&gt;CNNs 가 texture에 편향되어 있음을 밝혀낸 논문이 있음 (&lt;a href=&quot;https://openreview.net/pdf?id=Bygh9j09KX&quot;&gt;Gerihos et al., ICLR 2019&lt;/a&gt;)&lt;/li&gt;
-  &lt;li&gt;CNN이 사실 구조를 보는 것이 아니라 texture를 봄. 사람은 구조를 보고 판단.&lt;/li&gt;
-  &lt;li&gt;VGG가 특히 texture에 민감&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;3-스타일-트랜스퍼-최신-연구-흐름-한-눈에-살펴보기&quot;&gt;3. 스타일 트랜스퍼: 최신 연구 흐름 한 눈에 살펴보기&lt;/h2&gt;
-
-&lt;h3 id=&quot;artistic-style-transfer-recent-trends-why--how&quot;&gt;Artistic Style Transfer: recent trends, why &amp;amp; how?&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;하나의 스타일마다 네트워크 하나씩 학습하는 것이 필요. 실용적이지 않음&lt;/li&gt;
-  &lt;li&gt;Instance Normalization: 스타일 변환 결과가 컨텐츠 이미지의 Contrast에 따라 바뀌지 않게 하자&lt;/li&gt;
-  &lt;li&gt;Conditional Instance Normalization (CIN): 하나의 모델이 하나의 스타일만 변환하던 문제해결을 시도&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Adaptive Instance Normalization (AdaIN)&lt;/strong&gt;: Scaling과 Shifting 값을 구하는 과정을 학습과 분리함. (고양이, 사자를 따로 encoding 후 사자 스타일을 고양이에 입힘)&lt;/li&gt;
-  &lt;li&gt;Whitening and Coloring Transforms (WCT): AdaIn에서 평균과 분산만 맞추던 것을 공분산까지 맞춤&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;photorealistic-style-transfer-recent-trends-why--how&quot;&gt;Photorealistic Style Transfer: recent trends, why &amp;amp; how?&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Deep Photo Style Transfer: 스타일 변환 전후 픽셀 간의 관계를 맞춰줌. gram matrix를 영역별로 나눠서 최적화.&lt;/li&gt;
-  &lt;li&gt;PhotoWCT: decoding 할때 어디서 max pooling이 일어낫는지 알려줌 &amp;gt; 후처리에서 다 보정됨.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;wct-via-wavelet-corrected-transforms-wct2-후처리-없이-기존-모델보다-성능이-좋은-모델을-개발&quot;&gt;WCT via Wavelet Corrected Transforms (WCT2): 후처리 없이 기존 모델보다 성능이 좋은 모델을 개발.&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Pooling과 비슷한 역할을 하면서 Encode-decode 과정에서 정보를 잃지 않아야하고, 입력이미지의 특징을 잘 표현할수 있는 모듈 -&amp;gt; Wavelet 변환 활용함. (신호 처리 이론)&lt;/li&gt;
-  &lt;li&gt;Multi-level 대신 한번의 feed-forward만 수행&lt;/li&gt;
-  &lt;li&gt;비디오 스타일 변환도 잘 됨.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;세션3-문자인식ocr-얼마나-정확하지-문자인식-성능을-정확하게-측정하는-방법---최찬규님&quot;&gt;세션3: 문자인식(OCR), 얼마나 정확하지? (문자인식 성능을 정확하게 측정하는 방법) - 최찬규님&lt;/h1&gt;
-
-&lt;h2 id=&quot;1-성능평가의-중요성&quot;&gt;1. 성능평가의 중요성&lt;/h2&gt;
-
-&lt;h3 id=&quot;성능-평가의-중요성&quot;&gt;성능 평가의 중요성&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;성능을 개선하기 위해 (문제점을 정확하게 파악)&lt;/li&gt;
-  &lt;li&gt;모델 선택 (많은 모델 중 어떤 모델을 서비스 할 것인가?)&lt;/li&gt;
-  &lt;li&gt;다른 연구 그룹과의 성능 비교 (ImageNet, Kaggle)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;어떻게-하나&quot;&gt;어떻게 하나?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;눈으로 (사람이 직접 평가): 시간과 비용이 많이 들고, 평가에 오류가 있을 수 있음&lt;/li&gt;
-  &lt;li&gt;컴퓨터 (자동 평가 시스템): 시간과 비용이 거의 들지 않으며, 평가에 오류가 없음&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;2-문자인식-개론&quot;&gt;2. 문자인식 개론&lt;/h2&gt;
-
-&lt;p&gt;문자인식: 오프라인의 글자를 기계가 읽을 수 있도록 디지털화 한것&lt;/p&gt;
-
-&lt;h3 id=&quot;응용분야&quot;&gt;응용분야&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;자동차 번호판, 명함, 신용카드, 신분증 인식, 이미지 번역 등&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;문자인식-과정&quot;&gt;문자인식 과정&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;문자검출: text detection&lt;/li&gt;
-  &lt;li&gt;문자 인식: text recognition&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;3-기존의-성능-측정-방법&quot;&gt;3. 기존의 성능 측정 방법&lt;/h2&gt;
-
-&lt;h3 id=&quot;precision--recall&quot;&gt;Precision &amp;amp; Recall&lt;/h3&gt;
-&lt;p&gt;ex) 암진단 - TP, FN, FP, TN&lt;/p&gt;
-
-&lt;p&gt;Precision: 예측한 True 중에서 True를 올바르게 예측한 비율
-Recall: 실제 True 중에서 True를 올바르게 예측한 비율&lt;/p&gt;
-
-&lt;h3 id=&quot;검출기인식기end-to-end-성능-측정방법&quot;&gt;검출기/인식기/End-to-End 성능 측정방법&lt;/h3&gt;
-
-&lt;h4 id=&quot;문자검출&quot;&gt;문자검출&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;IoU (Intersection over Union): 정답(Ground Truth)와 예측 박스의 영역이 얼마나 겹치는지 확인 (50%이상이면 hit)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;문자인식&quot;&gt;문자인식&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;WEM(Word based Exactly Matching): 정답과 예측 단어가 정확히 일치하는지 체크 (단어기반)&lt;/li&gt;
-  &lt;li&gt;1-NED(Normalized Edit Distance): 두 단어간 편집거리(삽입, 교환, 삭제)를 측정한 뒤, 긴 단어의 길이로 정규화 (글자기반)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;end-to-end-검출인식-평가&quot;&gt;End-to-End (검출+인식) 평가&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/67667596-7fca4200-f9b1-11e9-8604-4c6ce438915c.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;순차(Cascade) 평가 처리: 검출 평가(IoU) -&amp;gt; 인식 평가(WEM, 1-NED)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;4-기존-방법의-문제점-사례와-그-빈도&quot;&gt;4. 기존 방법의 문제점 (사례와 그 빈도)&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;정교한 성능 측정 불가 (IoU에서 겹치는 영역이 50%가 넘지만 필요한 글자를 인식하지 못한 경우)&lt;/li&gt;
-  &lt;li&gt;One-to-Many, Many-to-One 문제
-    &lt;ul&gt;
-      &lt;li&gt;One-to-Many: 하나의 정답 박스가 여러개의 박스로 나뉘어 예측되는 경우 (split) e.g) Riverside -&amp;gt; River, side&lt;/li&gt;
-      &lt;li&gt;Many-to-One: 여러개의 정답 박스가 한개의 박스로 합쳐져 예측되는 경우 (Merge)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;end-to-end에서 잘못된 오류가 전파됨.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;5-신규-제안-방법--popeval&quot;&gt;5. 신규 제안 방법 : PopEval&lt;/h2&gt;
-
-&lt;h3 id=&quot;설계시-고려한-점&quot;&gt;설계시 고려한 점&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;End-to-End 평가&lt;/li&gt;
-  &lt;li&gt;One-to-Many, Many-to-One 문제 해결&lt;/li&gt;
-  &lt;li&gt;정교하게 세부적으로 성능 측정 가능&lt;/li&gt;
-  &lt;li&gt;기존 평가셋과 호환되어야 함&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;신규-방법&quot;&gt;신규 방법&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/67667597-7fca4200-f9b1-11e9-9739-5e6781252d04.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;겹치는 영역의 글자 중에서, 같은 글자(=맞춘 글자)를 하나씩 지움&lt;/li&gt;
-  &lt;li&gt;Recall: 맞춘 글자수 / 정답 글자수&lt;/li&gt;
-  &lt;li&gt;Precision: 맞축 글자수 / 예측한 글자수&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;엣지-케이스&quot;&gt;엣지 케이스&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;제거해야할 글자가 중복될 경우 어떤 글자부터 제거할 것인가? e.g. N”A”VER, P”A”PAGO&lt;/li&gt;
-  &lt;li&gt;중복이 없는 박스 우선 제거, 교집합이 클수록 우선&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;6-신규-성능-평가-방법의-검증-실험&quot;&gt;6. 신규 성능 평가 방법의 검증 실험&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;One-to-Many, Many-to-One 문제는 얼마나 발생하나? 전체 2~9%. 리더보드 TOP10 순위에 영향을 줌&lt;/li&gt;
-  &lt;li&gt;기존 평가셋(=단어 단위)과 호환 가능한가? 호환 가능&lt;/li&gt;
-  &lt;li&gt;신규 평가 방법은 믿을만 한가? (평가자를 모집해서 기존/신규 평가 방법에 대한 평가)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;실험-환경&quot;&gt;실험 환경&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;OCR 평가셋 - IC13, IC15 평가셋 사용&lt;/li&gt;
-  &lt;li&gt;예측 모델:
-    &lt;ul&gt;
-      &lt;li&gt;검출기: EAST, PixelLink&lt;/li&gt;
-      &lt;li&gt;인식기: GRCNN, ASTER&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;세션4-레이블링-조금-잘못돼도-괜찮아요-clova가-레이블-노이즈-잡는-법---강재욱님&quot;&gt;세션4: 레이블링 조금 잘못돼도 괜찮아요: Clova가 레이블 노이즈 잡는 법 - 강재욱님&lt;/h1&gt;
-
-&lt;p&gt;데이터 전략에 대한 노하우가 실제 경쟁력이라고 생각함.&lt;/p&gt;
-
-&lt;h2 id=&quot;1-레이블-노이즈가-무엇인가&quot;&gt;1. 레이블 노이즈가 무엇인가?&lt;/h2&gt;
-
-&lt;p&gt;레이블 노이즈: 같은 범주의 데이터를 잘못 설명하는 의도되지 않은 Mislabel&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/67667595-7f31ab80-f9b1-11e9-87c4-3942fc54f3b7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;왜-문제인가&quot;&gt;왜 문제인가?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;레이블 노이즈는 모델의 feature extraction 을 어렵게함&lt;/li&gt;
-  &lt;li&gt;모델의 성능을 떨어뜨리게 함&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;어떻게-해결할-것인가&quot;&gt;어떻게 해결할 것인가?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;훈련모델 = 훈련방법 (데이터, 모델구조)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;approach1-모델구조&quot;&gt;Approach1: 모델구조:&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;복잡한 패턴도 잘 인식하는 모델 구조를 쓴다&lt;/li&gt;
-  &lt;li&gt;서빙 및 훈련 계산량이 증가함&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;approach2-훈련방법&quot;&gt;Approach2: 훈련방법&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;커리큘럼을 만들어서 학습시킨다. (쉬운 데이터 부터 학습)&lt;/li&gt;
-  &lt;li&gt;훈련 계산량 증가 + 추가 데이터 필요&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;approach3-data-cleaning-method&quot;&gt;Approach3: Data Cleaning Method&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;Human Data Cleaning&lt;/li&gt;
-  &lt;li&gt;Active Learning (모델이 1차로 labeling -&amp;gt; 사람이 re-labeling)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;사람의-도움-없이-레이블-노이즈를-제거-할-수-없을까&quot;&gt;사람의 도움 없이 레이블 노이즈를 제거 할 수 없을까?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Model inference&lt;/li&gt;
-  &lt;li&gt;Relabeling by model&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;2-레이블링-바로잡는-automl-in-project-khan&quot;&gt;2. 레이블링 바로잡는 AutoML (in project Khan)&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;문제: 흰 오리 한마리가 mislabeled 되어있을 때 어떻게 고칠 수 있을까?&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;split--train---check-알고리즘&quot;&gt;Split -Train - Check 알고리즘&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Split: 전체 dataset을 train /valid set으로 분할&lt;/li&gt;
-  &lt;li&gt;Train: correction을 위한 “기준 데이터”&lt;/li&gt;
-  &lt;li&gt;Checker : 레이블 Correction용도로 훈련한 모델. valid set를 훈련된 checker에 입력하여 labeling 검사!&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;multisplit--train--check---vote&quot;&gt;MultiSplit – Train – Check - Vote&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/67667594-7f31ab80-f9b1-11e9-8dfa-6e454d11d5bf.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;여러버전의 Split branch를 구성&lt;/li&gt;
-  &lt;li&gt;Vote: Label update를 위해서 각 branch의 “Split-Train-Check” 결과를 결합&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;어떻게-vote하면-좋을까&quot;&gt;어떻게 Vote하면 좋을까?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Majority Vote: 가장 단순한 방법.&lt;/li&gt;
-  &lt;li&gt;checker 의 soft-value 값을 활용! -&amp;gt; PICO&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;3-pico-probabilistic-iterative-correction&quot;&gt;3. PICO: Probabilistic Iterative COrrection&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;checker의 결과 베이지안 확률 결합&lt;/li&gt;
-  &lt;li&gt;labeling의 Iterative Probabilistic correction&lt;/li&gt;
-  &lt;li&gt;레이블링 히스토리의 hidden markov modeling을 통한 반영&lt;/li&gt;
-  &lt;li&gt;반복적 확률적 Vote를 통해서 점진적으로 레이블 노이즈를 제거함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;설계와-구현사이-삽질기&quot;&gt;설계와 구현사이 삽질기&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;많은 checker를 학습해야함. (GPU 리소스 이슈)&lt;/li&gt;
-  &lt;li&gt;확률값 저장 시 메모리 이슈 (Spark, sparse matrix 활용)&lt;/li&gt;
-  &lt;li&gt;inference 서버 부하 이슈 (local serving project)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;pico-architecture&quot;&gt;PICO Architecture&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/16538186/67667851-1f87d000-f9b2-11e9-9ddb-fc95202e9a6a.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;4-faq-데이터-셋에-적용해-보기&quot;&gt;4. FAQ 데이터 셋에 적용해 보기&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;LINE 사용에 관한 FAQ 톡 서비스 데이터 set에 적용&lt;/li&gt;
-  &lt;li&gt;일반적인 답변 인텐트 -&amp;gt; 구체적인 답변 인텐트로 변화함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;5-개선-방향&quot;&gt;5. 개선 방향&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;효율개선 - 데이터 셋 품질 사전 검증 모듈(PICO-trigger)&lt;/li&gt;
-  &lt;li&gt;품질개선: 생성모델를 통한 Imbalance Dataset 문제 해결&lt;/li&gt;
-  &lt;li&gt;품질개선: 다양한 Metric voting 방식 적용&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;6-요약&quot;&gt;6. 요약&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;데이터 품질 전략이 없는 AI 프로젝트는 성공 하기 어려움&lt;/li&gt;
-  &lt;li&gt;AI 데이터 자동정제 파이프라인은 매우 큰 경쟁력&lt;/li&gt;
-  &lt;li&gt;Naver Clova Chatbot Builder는 PICO를 통해서 데이터 자동 정제하여 서비스 품질 개선&lt;/li&gt;
-  &lt;li&gt;PICO 아키텍쳐는 다른 종류 데이터 셋에도 적용 가능&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;세션5-자율주행-시뮬레이터를-개발하면서-경험한-한계점-및-활용-방안---홍준님&quot;&gt;세션5: 자율주행 시뮬레이터를 개발하면서 경험한 한계점 및 활용 방안 - 홍준님&lt;/h1&gt;
-
-&lt;h2 id=&quot;0-전달하고자-하는-내용&quot;&gt;0. 전달하고자 하는 내용&lt;/h2&gt;
-
-&lt;p&gt;시뮬레이터의 한계점과 효과적으로 활용할 수 있는 방법&lt;/p&gt;
-
-&lt;h2 id=&quot;1-자율주행-시뮬레이터란&quot;&gt;1. 자율주행 시뮬레이터란?&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Real-World를 대체하는 것이 시뮬레이터의 역할임.&lt;/li&gt;
-  &lt;li&gt;구현하기 어려운 Edge case(차량에 비친 차량, 도로 위에 날아다니는 비닐 등) 들이 존재함&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;시뮬레이터가-필요한-이유&quot;&gt;시뮬레이터가 필요한 이유?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;실차를 이용하는 필드 테스트의 한계점이 있기 때문에&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;시뮬레이터에서의-이슈&quot;&gt;시뮬레이터에서의 이슈&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;실제와 얼마나 비슷한가?&lt;/li&gt;
-  &lt;li&gt;GT를 얻을 수 있는가?&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;2-인지-분야에서의-이슈&quot;&gt;2. “인지” 분야에서의 이슈&lt;/h2&gt;
-
-&lt;h3 id=&quot;질문1-가상-센서의-완벽한-정답-데이터를-얻을-수-있는가&quot;&gt;질문1: 가상 센서의 완벽한 정답 데이터를 얻을 수 있는가?&lt;/h3&gt;
-
-&lt;h4 id=&quot;3d-map&quot;&gt;3D map&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;실제 존재하는 맵을 만들 경우 시간, 비용이 매우 많이 듦&lt;/li&gt;
-  &lt;li&gt;해당 지역 촬영 및 3D 복원 -&amp;gt; 3D 리터치, 오브젝트 분리작업 -&amp;gt; 텍스쳐, 머티리얼, 라이팅 작업&lt;/li&gt;
-  &lt;li&gt;표지판, 차량 등 오브젝트 생성&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;gps&quot;&gt;GPS&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;정밀한 HD Map이 있어야 구현 가능함&lt;/li&gt;
-  &lt;li&gt;신호가 약/강한 지역 구현&lt;/li&gt;
-  &lt;li&gt;Sensor Noise modeling (Multipath error)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;camera&quot;&gt;Camera&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;아직은 현실 데이터와 차이가 많이 남&lt;/li&gt;
-  &lt;li&gt;GT를 얻기 쉽기 때문에 virtual data를 많이 활용하려고 함.&lt;/li&gt;
-  &lt;li&gt;Dataset으로써 역할은 충분히 가능함&lt;/li&gt;
-  &lt;li&gt;Future work: 사용자의 카메라와 같은 “스타일”의 이미지로 데이터를 Translation해야한다&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;lidar&quot;&gt;Lidar&lt;/h4&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Distance + Intensity&lt;/li&gt;
-  &lt;li&gt;Noise의 모델링이 실제와 너무 달라 어려움&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;질문2-센서는-몇개나-사용할-수-있나요&quot;&gt;질문2: 센서는 몇개나 사용할 수 있나요?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;환경 모사를 위한 CPU가 따로 필요함 (사용자의 PC성능에 달려있음)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;3-판단-분야에서의-이슈&quot;&gt;3. “판단” 분야에서의 이슈&lt;/h2&gt;
-
-&lt;h3 id=&quot;질문3-시뮬레이터의-주변-차량들이-사람처럼-움직였으면-좋겠어요&quot;&gt;질문3: 시뮬레이터의 주변 차량들이 사람처럼 움직였으면 좋겠어요.&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;주변 차량이 사람처럼 주행하려면 결국 완전 자율 주행이 가능해야 함.&lt;/li&gt;
-  &lt;li&gt;실제 도로에는 다양한 차량, 성향의 사람이 존재함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;방법&quot;&gt;방법&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;주변 차량의 파라미터 자유도를 높이자&lt;/li&gt;
-  &lt;li&gt;멀티플레이로 “진짜”사람이 운전하는 상대 차량&lt;/li&gt;
-  &lt;li&gt;딥러닝 적용&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;질문4-시나리오는-어떤것이-있나요&quot;&gt;질문4: 시나리오는 어떤것이 있나요?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;시나리오를 튜닝할 수 있도록 함.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;4-제어-분야에서의-이슈&quot;&gt;4. “제어” 분야에서의 이슈&lt;/h2&gt;
-
-&lt;h3 id=&quot;질문5-실제-차량과-가상의-차량의-dynamics가-얼마나-동일한가요&quot;&gt;질문5: 실제 차량과 가상의 차량의 Dynamics가 얼마나 동일한가요?&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;꽤나 비슷하지만 필드 테스트는 꼭 필요함.&lt;/li&gt;
-  &lt;li&gt;검증된 시뮬레이터들이 많음.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;5-알고리즘-개발-넘김&quot;&gt;5. 알고리즘 개발 (넘김)&lt;/h2&gt;
-
-&lt;h1 id=&quot;좋았던-점새로-알게됨-점시도해볼-것&quot;&gt;좋았던 점/새로 알게됨 점/시도해볼 것&lt;/h1&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/PAIR-code/facets&quot;&gt;facet&lt;/a&gt;으로 샘플 데이터 시각화&lt;/li&gt;
-  &lt;li&gt;대용량 분산처리가 어려운 사전 NLP 작업의 경우(라이브러리 설치 등) API화 하여 호출하여 사용&lt;/li&gt;
-  &lt;li&gt;모델 서빙 시 inference 서버 외 전/후 처리(비즈니스 로직 등)를 담당하는 서버 따로 사용&lt;/li&gt;
-  &lt;li&gt;Labeling 오류 수정 자동화 &amp;gt; PICO 알고리즘 테스트 해보기&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">Deview2019 참석 후 작성한 세션 요약글 입니다.</summary></entry></feed>
+&lt;p&gt;예제는 크게 어렵지 않았는데, gRPC의 개념에 대해서는 익숙하지 않아 이해하기 좀 어려웠습니다. 그렇지만 예제를 한번 작성해보고 나니, 개념과 장점에 대해서 좀 더 잘 와닿았던 것 같습니다. 다음에는 tensorflow serving 에서 제공하는 gRPC 통신으로 변경 시 성능 변화가 얼마나 있는지 테스트 해보려고 합니다.&lt;/p&gt;</content><author><name></name></author><summary type="html">tensorflow serving에서 제공하는 gRPC 통신을 사용해보기전 간단히 gRPC에 대한 개념을 공부하고, 간단한 예제를 구현해보았습니다.</summary></entry></feed>
